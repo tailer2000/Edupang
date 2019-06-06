@@ -32,6 +32,14 @@ public class GameState implements IState {
 	private GraphicObject m_battleground;
 	// 계산기 대입
 	private Calcultation cal;
+	private String formula_first = "";
+	private String formula_second = "";
+	private String formula_third = "";
+	private String formula_four = "";
+	private int formula_count = 0;
+
+	//입력값 늦추기 위한 변수
+	private long afterTime = System.currentTimeMillis();
 
 	private GraphicObject m_keypad;
     private GraphicObject m_shootpad;
@@ -109,9 +117,24 @@ public class GameState implements IState {
 			m_divideButton.Draw(canvas);
 			m_mutipleButton.Draw(canvas);
 			m_minusButton.Draw(canvas);
+
 			canvas.drawText(cal.GetFormula(),tile_x*7, tile_y*40, p);
 			canvas.drawText(cal.GetTestString(),tile_x*7, tile_y*50, p);
 			canvas.drawText(cal.GetAnwserString(), tile_x*25, tile_y*60, p);
+
+			if(formula_count > 0){
+				canvas.drawText(formula_first, tile_x*17, tile_y*50, p);
+				if(formula_count > 1){
+					canvas.drawText(formula_second, tile_x*37, tile_y*50, p);
+					if(formula_count > 2){
+						canvas.drawText(formula_third, tile_x*57, tile_y*50, p);
+						if(formula_count > 3) {
+							canvas.drawText(formula_four, tile_x*77, tile_y*50, p);
+						}
+					}
+				}
+			}
+
 		}
 		else if(state == END_SCENE)
 		{
@@ -131,8 +154,26 @@ public class GameState implements IState {
 		tile_y = AppManager.getInstance().getHeight()/100;
 	}
 
+	public void RightAnwser() throws Exception {
+		formula_first = "";
+		formula_second = "";
+		formula_third = "";
+		formula_four = "";
+		formula_count = 0;
+		MakeTest();
+	}
+
+	public void WrongAnwser()
+	{
+		formula_first = "";
+		formula_second = "";
+		formula_third = "";
+		formula_four = "";
+		formula_count = 0;
+	}
+
     @Override
-    public void Update() {
+    public void Update() throws Exception {
         long GameTime = System.currentTimeMillis();
         m_background.Update(GameTime);
         if(state == GAMESTART_SCENE)
@@ -149,6 +190,61 @@ public class GameState implements IState {
 			m_minusButton.SetPosition(tile_x*30, tile_y*80);
 			m_mutipleButton.SetPosition(tile_x*55, tile_y*80);
 			m_divideButton.SetPosition(tile_x*80, tile_y*80);
+
+			//식을 전부 채웠을 때
+			if(formula_count == 4)
+			{
+				String str = "";
+				ArrayList<Integer> numList = cal.GetNumList();
+				str +=  String.valueOf(numList.get(0));
+
+				if(formula_first == "×")
+					str += "*";
+				else if(formula_first == "÷")
+					str += "/";
+				else
+					str += formula_first;
+
+				str +=  String.valueOf(numList.get(1));
+
+				if(formula_second == "×")
+					str += "*";
+				else if(formula_second == "÷")
+					str += "/";
+				else
+					str += formula_second;
+
+				str +=  String.valueOf(numList.get(2));
+
+				if(formula_third == "×")
+					str += "*";
+				else if(formula_third == "÷")
+					str += "/";
+				else
+					str += formula_third;
+
+				str +=  String.valueOf(numList.get(3));
+
+				if(formula_four == "×")
+					str += "*";
+				else if(formula_four == "÷")
+					str += "/";
+				else
+					str += formula_four;
+
+				str +=  String.valueOf(numList.get(4));
+
+				if(cal.GetRealAnwser() == Integer.valueOf(cal.bracketCalMain(str))){
+					System.out.println("정답");
+					RightAnwser();
+				}
+				else {
+					System.out.println("틀림");
+					WrongAnwser();
+				}
+
+			}
+
 		}
 		else if(state == END_SCENE)
 		{
@@ -171,7 +267,11 @@ public class GameState implements IState {
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		
+
+		long CurruntTime = System.currentTimeMillis();
+		if(CurruntTime - afterTime < 100)
+			return false;
+		afterTime = CurruntTime;
 
 		for(int i =0; i<event.getPointerCount();i++){
 			int _x = (int) event.getX(i);
@@ -196,21 +296,96 @@ public class GameState implements IState {
 				if(Collision.CollisionCheckPointToBox(_x,_y, m_plusButton.GetX(), m_plusButton.GetY(),
 						m_plusButton.GetX() + tile_x * 15, m_plusButton.GetY() + tile_y * 8)){
 					m_plusButton.ChangeBitmap(AppManager.getInstance().getBitmap(R.drawable.plus_click));
+
+					if(formula_count < 4){
+						switch (formula_count){
+							case 0:
+								formula_first = "+";
+								break;
+							case 1:
+								formula_second = "+";
+								break;
+							case 2:
+								formula_third = "+";
+								break;
+							case 3:
+								formula_four = "+";
+								break;
+						}
+						formula_count++;
+					}
+
 				}
 				//click minus button
 				if(Collision.CollisionCheckPointToBox(_x,_y, m_minusButton.GetX(), m_minusButton.GetY(),
 						m_minusButton.GetX() + tile_x * 15, m_minusButton.GetY() + tile_y * 8)){
 					m_minusButton.ChangeBitmap(AppManager.getInstance().getBitmap(R.drawable.minus_click));
+
+					if(formula_count < 4){
+						switch (formula_count){
+							case 0:
+								formula_first = "-";
+								break;
+							case 1:
+								formula_second = "-";
+								break;
+							case 2:
+								formula_third = "-";
+								break;
+							case 3:
+								formula_four = "-";
+								break;
+						}
+						formula_count++;
+					}
+
 				}
 				//click multiple button
 				if(Collision.CollisionCheckPointToBox(_x,_y, m_mutipleButton.GetX(), m_mutipleButton.GetY(),
 						m_mutipleButton.GetX() + tile_x * 15, m_mutipleButton.GetY() + tile_y * 8)){
 					m_mutipleButton.ChangeBitmap(AppManager.getInstance().getBitmap(R.drawable.multiple_click));
+
+					if(formula_count < 4){
+						switch (formula_count){
+							case 0:
+								formula_first = "×";
+								break;
+							case 1:
+								formula_second = "×";
+								break;
+							case 2:
+								formula_third = "×";
+								break;
+							case 3:
+								formula_four = "×";
+								break;
+						}
+						formula_count++;
+					}
 				}
 				//click divide button
 				if(Collision.CollisionCheckPointToBox(_x,_y, m_divideButton.GetX(), m_divideButton.GetY(),
 						m_divideButton.GetX() + tile_x * 15, m_divideButton.GetY() + tile_y * 8)){
 					m_divideButton.ChangeBitmap(AppManager.getInstance().getBitmap(R.drawable.divide_click));
+
+					if(formula_count < 4){
+						switch (formula_count){
+							case 0:
+								formula_first = "÷";
+								break;
+							case 1:
+								formula_second = "÷";
+								break;
+							case 2:
+								formula_third = "÷";
+								break;
+							case 3:
+								formula_four = "÷";
+								break;
+						}
+						formula_count++;
+					}
+
 				}
 			}
 			else if(state == END_SCENE)

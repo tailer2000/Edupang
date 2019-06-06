@@ -60,7 +60,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	    _thread.start();
 	}
 	
-	public void Update() {
+	public void Update() throws Exception {
 		m_state.Update();
 	}
 

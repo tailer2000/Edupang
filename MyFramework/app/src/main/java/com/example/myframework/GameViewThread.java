@@ -22,9 +22,13 @@ public class GameViewThread extends Thread {
     public void run() {
         Canvas c;
         while (_run) {
-        	
-        	_gameview.Update();
-        	
+
+            try {
+                _gameview.Update();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             c = null;
             try {
                 c = _surfaceHolder.lockCanvas(null);
