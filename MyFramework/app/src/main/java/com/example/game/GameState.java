@@ -30,6 +30,8 @@ public class GameState implements IState {
 	private Player m_player;
 	private BackGround m_background;
 	private GraphicObject m_battleground;
+	// 계산기 대입
+	private Calcultation cal;
 
 	private GraphicObject m_keypad;
     private GraphicObject m_shootpad;
@@ -60,7 +62,7 @@ public class GameState implements IState {
 	}
 	
 	@Override
-	public void Init() {
+	public void Init() throws Exception {
 		m_title = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.title));
 		// background
 		m_background = new BackGround(0);
@@ -73,6 +75,7 @@ public class GameState implements IState {
 		m_divideButton = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.divide_released));
 		// enemy
 		m_monster_1 = new Enemy_1();
+		cal = new Calcultation();
 	}
 
 	public void CheckCollision(){
@@ -82,12 +85,16 @@ public class GameState implements IState {
 	public void MakeEnemy(){
 
 	}
-	
+
+	public void MakeTest() throws Exception {
+		cal.MakeAnwser();
+	}
 	
 	@Override
 	public void Render(Canvas canvas) {
 		Paint p = new Paint();
-    	m_background.Draw(canvas);
+		p.setTextSize((int)tile_x*15);
+		m_background.Draw(canvas);
     	if(state == GAMESTART_SCENE)
 		{
 			m_title.Draw(canvas);
@@ -102,6 +109,9 @@ public class GameState implements IState {
 			m_divideButton.Draw(canvas);
 			m_mutipleButton.Draw(canvas);
 			m_minusButton.Draw(canvas);
+			canvas.drawText(cal.GetFormula(),tile_x*7, tile_y*40, p);
+			canvas.drawText(cal.GetTestString(),tile_x*7, tile_y*50, p);
+			canvas.drawText(cal.GetAnwserString(), tile_x*25, tile_y*60, p);
 		}
 		else if(state == END_SCENE)
 		{
@@ -111,8 +121,6 @@ public class GameState implements IState {
 		{
 
 		}
-
-
 
 		//canvas.drawText("Score :"+String.valueOf(m_score),0,40,p);
 	}

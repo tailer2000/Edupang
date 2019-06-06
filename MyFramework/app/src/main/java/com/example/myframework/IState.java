@@ -6,7 +6,7 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 public interface IState {
-	public void Init();
+	public void Init() throws Exception;
 		// 이상태로 바뀌었을때 실행될것들
 	public void Destroy();
 		// 다른상태로 바뀔때 실행될것들

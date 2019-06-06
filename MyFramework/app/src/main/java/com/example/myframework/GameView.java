@@ -21,7 +21,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 	private IState m_state;
 	
 	
-    public GameView(Context context) {
+    public GameView(Context context) throws Exception {
         super(context);
         
     	setFocusable(true);
@@ -93,7 +93,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 
 	}
 	
-	public void ChangeGameState(IState _state){
+	public void ChangeGameState(IState _state) throws Exception {
 		if(m_state!=null)
 			m_state.Destroy();
 		_state.Init();

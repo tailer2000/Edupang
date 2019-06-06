@@ -9,7 +9,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main);
-        setContentView(new GameView(this));
+        try {
+            setContentView(new GameView(this));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         DisplayMetrics metrics = this.getResources().getDisplayMetrics();
         int width = metrics.widthPixels;
         int height = metrics.heightPixels;
