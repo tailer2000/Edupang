@@ -118,7 +118,7 @@ public class GameState implements IState {
 			m_mutipleButton.Draw(canvas);
 			m_minusButton.Draw(canvas);
 
-			canvas.drawText(cal.GetFormula(),tile_x*7, tile_y*40, p);
+			//canvas.drawText(cal.GetFormula(),tile_x*7, tile_y*40, p);
 			canvas.drawText(cal.GetTestString(),tile_x*7, tile_y*50, p);
 			canvas.drawText(cal.GetAnwserString(), tile_x*25, tile_y*60, p);
 
@@ -155,6 +155,9 @@ public class GameState implements IState {
 	}
 
 	public void RightAnwser() throws Exception {
+
+		m_monster_1.Damage(25);
+
 		formula_first = "";
 		formula_second = "";
 		formula_third = "";
@@ -170,6 +173,9 @@ public class GameState implements IState {
 		formula_third = "";
 		formula_four = "";
 		formula_count = 0;
+
+		//나중에 바꿀 곳
+		m_monster_1.Attack();
 	}
 
     @Override
