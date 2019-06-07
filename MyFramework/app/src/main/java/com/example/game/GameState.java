@@ -48,11 +48,12 @@ public class GameState implements IState {
 	private GraphicObject m_minusButton;
 	private GraphicObject m_mutipleButton;
 	private GraphicObject m_divideButton;
-    private Enemy_1 m_monster_1;
+	private GraphicObject m_cancle;
+	private Enemy_1 m_monster_1;
 
-    int currcount = 999;
-    int prevcount = 999;
-    String timecount = Integer.toString(999);
+    int currcount = 9999;
+    int prevcount = 9999;
+    String timecount = Integer.toString(9999);
 
 	public int m_score = 0;
 	public int tile_x = 0;
@@ -81,6 +82,7 @@ public class GameState implements IState {
 		m_minusButton = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.minus_released));
 		m_mutipleButton = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.multiple_released));
 		m_divideButton = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.divide_released));
+		m_cancle = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.cancle));
 		// enemy
 		m_monster_1 = new Enemy_1();
 		cal = new Calcultation();
@@ -129,11 +131,12 @@ public class GameState implements IState {
 			m_divideButton.Draw(canvas);
 			m_mutipleButton.Draw(canvas);
 			m_minusButton.Draw(canvas);
+			m_cancle.Draw(canvas);
 
 			// Life_Timer
-			canvas.drawText(timecount, tile_x*40, tile_y * 40, p);
+			//canvas.drawText(timecount, tile_x*40, tile_y * 40, p);
 
-			//canvas.drawText(cal.GetFormula(),tile_x*7, tile_y*40, p);
+			canvas.drawText(cal.GetFormula(),tile_x*7, tile_y*40, p);
 			canvas.drawText(cal.GetTestString(),tile_x*7, tile_y*50, p);
 			canvas.drawText(cal.GetAnwserString(), tile_x*25, tile_y*60, p);
 
@@ -437,6 +440,7 @@ public class GameState implements IState {
 		m_minusButton.SetPosition(tile_x*30, tile_y*80);
 		m_mutipleButton.SetPosition(tile_x*55, tile_y*80);
 		m_divideButton.SetPosition(tile_x*80, tile_y*80);
+		m_cancle.SetPosition(tile_x*45, tile_y*90);
 	}
 
 	@Override
