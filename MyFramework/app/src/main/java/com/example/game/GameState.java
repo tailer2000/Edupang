@@ -10,7 +10,6 @@ import android.graphics.Rect;
 import android.os.Debug;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.widget.ProgressBar;
 
 import com.example.myframework.AppManager;
 import com.example.myframework.Collision;
@@ -51,8 +50,9 @@ public class GameState implements IState {
 	private GraphicObject m_divideButton;
     private Enemy_1 m_monster_1;
 
-    //int time = 0;
-	//ProgressBar bar;
+    int currcount = 999;
+    int prevcount = 999;
+    String timecount = Integer.toString(999);
 
 	public int m_score = 0;
 	public int tile_x = 0;
@@ -86,6 +86,18 @@ public class GameState implements IState {
 		cal = new Calcultation();
 	}
 
+	// 플레이어 체력 및 제한시간
+	public void Life_Timer(){
+		currcount = prevcount;
+		if(currcount > 0)
+			prevcount = prevcount - 1;
+		else if(currcount <= 0)
+		{
+			state = END_SCENE;
+		}
+		timecount = Integer.toString(currcount);
+	}
+
 	public void CheckCollision(){
 
 	}
@@ -117,6 +129,9 @@ public class GameState implements IState {
 			m_divideButton.Draw(canvas);
 			m_mutipleButton.Draw(canvas);
 			m_minusButton.Draw(canvas);
+
+			// Life_Timer
+			canvas.drawText(timecount, tile_x*40, tile_y * 40, p);
 
 			//canvas.drawText(cal.GetFormula(),tile_x*7, tile_y*40, p);
 			canvas.drawText(cal.GetTestString(),tile_x*7, tile_y*50, p);
@@ -164,6 +179,7 @@ public class GameState implements IState {
 		formula_four = "";
 		formula_count = 0;
 		MakeTest();
+		prevcount = prevcount + 100;
 	}
 
 	public void WrongAnwser()
@@ -176,6 +192,7 @@ public class GameState implements IState {
 
 		//나중에 바꿀 곳
 		m_monster_1.Attack();
+		prevcount = prevcount - 100;
 	}
 
     @Override
@@ -191,11 +208,7 @@ public class GameState implements IState {
 		else if(state == BATTLE_SCENE)
 		{
 			m_monster_1.Update(GameTime);
-			// button
-			m_plusButton.SetPosition(tile_x*5, tile_y*80);
-			m_minusButton.SetPosition(tile_x*30, tile_y*80);
-			m_mutipleButton.SetPosition(tile_x*55, tile_y*80);
-			m_divideButton.SetPosition(tile_x*80, tile_y*80);
+			Life_Timer();
 
 			//식을 전부 채웠을 때
 			if(formula_count == 4)
@@ -418,6 +431,12 @@ public class GameState implements IState {
 	{
 		m_battleground.SetRectPosition(0,0, AppManager.getInstance().getWidth(), tile_y *30);
 		m_monster_1.SetPosition(tile_x*20, tile_y);
+
+		// button
+		m_plusButton.SetPosition(tile_x*5, tile_y*80);
+		m_minusButton.SetPosition(tile_x*30, tile_y*80);
+		m_mutipleButton.SetPosition(tile_x*55, tile_y*80);
+		m_divideButton.SetPosition(tile_x*80, tile_y*80);
 	}
 
 	@Override
