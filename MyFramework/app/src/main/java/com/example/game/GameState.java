@@ -51,9 +51,6 @@ public class GameState implements IState {
 	private GraphicObject m_divideButton;
     private Enemy_1 m_monster_1;
 
-    //int time = 0;
-	//ProgressBar bar;
-
 	public int m_score = 0;
 	public int tile_x = 0;
 	public int tile_y = 0;
@@ -62,9 +59,11 @@ public class GameState implements IState {
 
 	long m_LastRegenEnemy = System.currentTimeMillis();
 
+	ProgressBar prog;
+
 	Random m_randEnem = new Random();
 	Random m_randItem = new Random();
-	
+
 	public GameState(){
 		AppManager.getInstance().m_gamestate = this;
 	}
@@ -97,7 +96,7 @@ public class GameState implements IState {
 	public void MakeTest() throws Exception {
 		cal.MakeAnwser();
 	}
-	
+
 	@Override
 	public void Render(Canvas canvas) {
 		Paint p = new Paint();
@@ -191,11 +190,6 @@ public class GameState implements IState {
 		else if(state == BATTLE_SCENE)
 		{
 			m_monster_1.Update(GameTime);
-			// button
-			m_plusButton.SetPosition(tile_x*5, tile_y*80);
-			m_minusButton.SetPosition(tile_x*30, tile_y*80);
-			m_mutipleButton.SetPosition(tile_x*55, tile_y*80);
-			m_divideButton.SetPosition(tile_x*80, tile_y*80);
 
 			//식을 전부 채웠을 때
 			if(formula_count == 4)
@@ -418,6 +412,12 @@ public class GameState implements IState {
 	{
 		m_battleground.SetRectPosition(0,0, AppManager.getInstance().getWidth(), tile_y *30);
 		m_monster_1.SetPosition(tile_x*20, tile_y);
+		// button
+		m_plusButton.SetPosition(tile_x*5, tile_y*80);
+		m_minusButton.SetPosition(tile_x*30, tile_y*80);
+		m_mutipleButton.SetPosition(tile_x*55, tile_y*80);
+		m_divideButton.SetPosition(tile_x*80, tile_y*80);
+
 	}
 
 	@Override
