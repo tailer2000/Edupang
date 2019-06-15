@@ -31,7 +31,13 @@ public class Enemy extends SpriteAnimation {
 		super(bitmap);
 	}
 	public void Damage(int damage){
-		hp -= damage; 
+		if(hp > 0) {
+			hp -= damage;
+			System.out.println(String.valueOf(hp));
+		}
+		else{
+			state = STATE_OUT;
+		}
 	}
 	public int GetHP(){
 		return hp;
@@ -44,7 +50,6 @@ public class Enemy extends SpriteAnimation {
 	@Override
 	public void Update(long GameTime){
 		super.Update(GameTime);
-		Attack();
 	}
 	
 }

@@ -3,6 +3,8 @@ package com.example.game;
 import java.util.ArrayList;
 import java.util.Random;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -10,7 +12,6 @@ import android.graphics.Rect;
 import android.os.Debug;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.widget.ProgressBar;
 
 import com.example.myframework.AppManager;
 import com.example.myframework.Collision;
@@ -28,7 +29,10 @@ public class GameState implements IState {
 
 	private long m_LastShoot = System.currentTimeMillis();
 	private Player m_player;
+	private BackGround m_title;
 	private BackGround m_background;
+    private BackGround m_gallery_background;
+    private BackGround m_end;
 	private GraphicObject m_battleground;
 	// 계산기 대입
 	private Calcultation cal;
@@ -43,13 +47,23 @@ public class GameState implements IState {
 
 	private GraphicObject m_keypad;
     private GraphicObject m_shootpad;
-    private GraphicObject m_title;
     private GraphicObject m_startButton;
+    private GraphicObject m_galleryButton;
+    private GraphicObject m_quitButton;
 	private GraphicObject m_plusButton;
 	private GraphicObject m_minusButton;
 	private GraphicObject m_mutipleButton;
 	private GraphicObject m_divideButton;
-    private Enemy_1 m_monster_1;
+	private GraphicObject m_cancle;
+    private GraphicObject m_progressbar_empty;
+    private GraphicObject m_progressbar_hp;
+    private GraphicObject m_hp;
+	private Enemy m_monster_1;
+	private ArrayList<Enemy> m_monster_list = new ArrayList<Enemy>();
+
+    int currcount = 99;
+    int prevcount = 99;
+
 
 	public int m_score = 0;
 	public int tile_x = 0;
@@ -58,8 +72,6 @@ public class GameState implements IState {
 	public int state = GAMESTART_SCENE;
 
 	long m_LastRegenEnemy = System.currentTimeMillis();
-
-	ProgressBar prog;
 
 	Random m_randEnem = new Random();
 	Random m_randItem = new Random();
@@ -70,19 +82,43 @@ public class GameState implements IState {
 	
 	@Override
 	public void Init() throws Exception {
-		m_title = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.title));
 		// background
-		m_background = new BackGround(0);
+		m_title = new BackGround(0);
+		m_background = new BackGround(1);
+        m_gallery_background = new BackGround(2);
+        m_end = new BackGround(3);
 		m_battleground = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.monsterground));
 		// button
-		m_startButton = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.gamestart_release));
+		m_startButton = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.gamestart));
+        m_galleryButton = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.gallery));
+        m_quitButton = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.gamequit));
+        // button(battle)
 		m_plusButton = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.plus_released));
 		m_minusButton = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.minus_released));
 		m_mutipleButton = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.multiple_released));
 		m_divideButton = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.divide_released));
+		m_cancle = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.resetbutton));
+		// Time & HP
+        m_progressbar_empty = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.progressbar_empty));
+        m_progressbar_hp = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.progressbar_hp));
+        m_hp = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.heart));
 		// enemy
 		m_monster_1 = new Enemy_1();
 		cal = new Calcultation();
+	}
+
+    float current_hp_right = 0;
+	// 플레이어 체력 및 제한시간
+	public void Life_Timer(){
+		currcount = prevcount;
+		if(currcount > 0)
+			prevcount = prevcount - 1;
+		else if(currcount <= 0)
+		{
+			state = END_SCENE;
+		}
+		current_hp_right = (1 - (1/currcount))*tile_x*96;
+        m_progressbar_hp.SetRectPosition(tile_x*10, tile_y*33, (int)current_hp_right, tile_y*35);
 	}
 
 	public void CheckCollision(){
@@ -90,6 +126,41 @@ public class GameState implements IState {
 	}
 
 	public void MakeEnemy(){
+		for(int i=0; i<10; ++i)
+		{
+			Random random = new Random();
+			int randInt = random.nextInt(5);
+
+			switch (randInt){
+				case 0:
+					Enemy monster_1 = new Enemy_1();
+					monster_1.SetPosition(tile_x*20, tile_y);
+					m_monster_list.add(monster_1);
+					break;
+				case 1:
+					Enemy monster_2 = new Enemy_2();
+					monster_2.SetPosition(tile_x*20, tile_y);
+					m_monster_list.add(monster_2);
+					break;
+				case 2:
+					Enemy monster_3 = new Enemy_3();
+					monster_3.SetPosition(tile_x*20, tile_y);
+					m_monster_list.add(monster_3);
+					break;
+				case 3:
+					Enemy monster_4 = new Enemy_4();
+					monster_4.SetPosition(tile_x*20, tile_y);
+					m_monster_list.add(monster_4);
+					break;
+				case 4:
+					Enemy monster_5 = new Enemy_5();
+					monster_5.SetPosition(tile_x*20, tile_y);
+					m_monster_list.add(monster_5);
+					break;
+			}
+		}
+
+		m_monster_list.get(0).state = Enemy.STATE_NORMAL;
 
 	}
 
@@ -101,21 +172,37 @@ public class GameState implements IState {
 	public void Render(Canvas canvas) {
 		Paint p = new Paint();
 		p.setTextSize((int)tile_x*15);
-		m_background.Draw(canvas);
+
     	if(state == GAMESTART_SCENE)
 		{
 			m_title.Draw(canvas);
 			m_startButton.Draw(canvas);
+            m_galleryButton.Draw(canvas);
+            m_quitButton.Draw(canvas);
 		}
     	else if(state == BATTLE_SCENE)
 		{
+			m_background.Draw(canvas);
 			m_battleground.DrawRect(canvas);
+
 			m_monster_1.Draw(canvas);
+
+			for(Enemy e : m_monster_list) {
+				if(e.state == Enemy.STATE_NORMAL)
+					e.Draw(canvas);
+			}
+
 			// button
 			m_plusButton.Draw(canvas);
 			m_divideButton.Draw(canvas);
 			m_mutipleButton.Draw(canvas);
 			m_minusButton.Draw(canvas);
+			m_cancle.Draw(canvas);
+
+			// Life_Timer
+            m_progressbar_empty.Draw(canvas);
+            m_progressbar_hp.DrawRect(canvas);
+            m_hp.Draw(canvas);
 
 			//canvas.drawText(cal.GetFormula(),tile_x*7, tile_y*40, p);
 			canvas.drawText(cal.GetTestString(),tile_x*7, tile_y*50, p);
@@ -137,11 +224,13 @@ public class GameState implements IState {
 		}
 		else if(state == END_SCENE)
 		{
-
+		    m_end.Draw(canvas);
+            m_cancle.Draw(canvas);
 		}
 		else if(state == COLLECTION_SCENE)
 		{
-
+		    m_gallery_background.Draw(canvas);
+            m_cancle.Draw(canvas);
 		}
 
 		//canvas.drawText("Score :"+String.valueOf(m_score),0,40,p);
@@ -155,7 +244,12 @@ public class GameState implements IState {
 
 	public void RightAnwser() throws Exception {
 
-		m_monster_1.Damage(25);
+		if(m_monster_1.state != Enemy.STATE_OUT)
+			m_monster_1.Damage(25);
+		else
+		{
+			//몬스터 늘어나면 추가될 작정
+		}
 
 		formula_first = "";
 		formula_second = "";
@@ -163,6 +257,7 @@ public class GameState implements IState {
 		formula_four = "";
 		formula_count = 0;
 		MakeTest();
+		prevcount = prevcount + 100;
 	}
 
 	public void WrongAnwser()
@@ -175,6 +270,7 @@ public class GameState implements IState {
 
 		//나중에 바꿀 곳
 		m_monster_1.Attack();
+		prevcount = prevcount - 100;
 	}
 
     @Override
@@ -184,12 +280,22 @@ public class GameState implements IState {
         if(state == GAMESTART_SCENE)
 		{
 			TileMap_Init();
-			m_title.SetPosition(tile_x*13, tile_y*15);
-			m_startButton.SetPosition(tile_x*6, tile_y*50);
+			m_startButton.SetPosition(tile_x*32, tile_y*40);
+            m_galleryButton.SetPosition(tile_x*32, tile_y*55);
+            m_quitButton.SetPosition(tile_x*32, tile_y*70);
 		}
 		else if(state == BATTLE_SCENE)
 		{
+
 			m_monster_1.Update(GameTime);
+
+			for(Enemy e : m_monster_list){
+				if(e.state == Enemy.STATE_NORMAL) {
+					e.Update(GameTime);
+				}
+			}
+
+			Life_Timer();
 
 			//식을 전부 채웠을 때
 			if(formula_count == 4)
@@ -254,8 +360,8 @@ public class GameState implements IState {
 		{
 
 		}
-        MakeEnemy();
-        CheckCollision();
+        //MakeEnemy();
+        //CheckCollision();
     }
 
 	@Override
@@ -281,21 +387,30 @@ public class GameState implements IState {
 			{
 				//click start button
 				if(Collision.CollisionCheckPointToBox(_x,_y, m_startButton.GetX(), m_startButton.GetY(),
-						m_startButton.GetX() + tile_x * 80, m_startButton.GetY() + tile_y * 20)){
-					m_startButton.ChangeBitmap(AppManager.getInstance().getBitmap(R.drawable.gamestart_click));
+						m_startButton.GetX() + tile_x * 35, m_startButton.GetY() + tile_y * 7)){
+					//m_startButton.ChangeBitmap(AppManager.getInstance().getBitmap(R.drawable.gamestart_click));
 					state = BATTLE_SCENE;
 					ChangeBattleScene();
 				}
-				else
-				{
-				}
+				// click galleryButton
+                if(Collision.CollisionCheckPointToBox(_x,_y, m_galleryButton.GetX(), m_galleryButton.GetY(),
+                        m_galleryButton.GetX() + tile_x * 35, m_galleryButton.GetY() + tile_y * 7)){
+                    state = COLLECTION_SCENE;
+                    m_cancle.SetPosition(0, 0);
+                }
+                // click quitButton
+                if(Collision.CollisionCheckPointToBox(_x,_y, m_quitButton.GetX(), m_quitButton.GetY(),
+                        m_quitButton.GetX() + tile_x * 35, m_quitButton.GetY() + tile_y * 7)){
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                }
+
 			}
 			else if(state == BATTLE_SCENE)
 			{
 				//click plus button
 				if(Collision.CollisionCheckPointToBox(_x,_y, m_plusButton.GetX(), m_plusButton.GetY(),
 						m_plusButton.GetX() + tile_x * 15, m_plusButton.GetY() + tile_y * 8)){
-					m_plusButton.ChangeBitmap(AppManager.getInstance().getBitmap(R.drawable.plus_click));
+					//m_plusButton.ChangeBitmap(AppManager.getInstance().getBitmap(R.drawable.plus_click));
 
 					if(formula_count < 4){
 						switch (formula_count){
@@ -319,7 +434,7 @@ public class GameState implements IState {
 				//click minus button
 				if(Collision.CollisionCheckPointToBox(_x,_y, m_minusButton.GetX(), m_minusButton.GetY(),
 						m_minusButton.GetX() + tile_x * 15, m_minusButton.GetY() + tile_y * 8)){
-					m_minusButton.ChangeBitmap(AppManager.getInstance().getBitmap(R.drawable.minus_click));
+					//m_minusButton.ChangeBitmap(AppManager.getInstance().getBitmap(R.drawable.minus_click));
 
 					if(formula_count < 4){
 						switch (formula_count){
@@ -343,7 +458,7 @@ public class GameState implements IState {
 				//click multiple button
 				if(Collision.CollisionCheckPointToBox(_x,_y, m_mutipleButton.GetX(), m_mutipleButton.GetY(),
 						m_mutipleButton.GetX() + tile_x * 15, m_mutipleButton.GetY() + tile_y * 8)){
-					m_mutipleButton.ChangeBitmap(AppManager.getInstance().getBitmap(R.drawable.multiple_click));
+					//m_mutipleButton.ChangeBitmap(AppManager.getInstance().getBitmap(R.drawable.multiple_click));
 
 					if(formula_count < 4){
 						switch (formula_count){
@@ -366,7 +481,7 @@ public class GameState implements IState {
 				//click divide button
 				if(Collision.CollisionCheckPointToBox(_x,_y, m_divideButton.GetX(), m_divideButton.GetY(),
 						m_divideButton.GetX() + tile_x * 15, m_divideButton.GetY() + tile_y * 8)){
-					m_divideButton.ChangeBitmap(AppManager.getInstance().getBitmap(R.drawable.divide_click));
+					//m_divideButton.ChangeBitmap(AppManager.getInstance().getBitmap(R.drawable.divide_click));
 
 					if(formula_count < 4){
 						switch (formula_count){
@@ -385,16 +500,43 @@ public class GameState implements IState {
 						}
 						formula_count++;
 					}
-
 				}
+
+				if(Collision.CollisionCheckPointToBox(_x,_y, m_cancle.GetX(), m_cancle.GetY(),
+						m_cancle.GetX() + tile_x * 15, m_cancle.GetY() + tile_y * 8)){
+					if(formula_count > 0){
+						switch (formula_count){
+							case 1:
+								formula_first = "";
+								break;
+							case 2:
+								formula_second = "";
+								break;
+							case 3:
+								formula_third = "";
+								break;
+							case 4:
+								formula_four = "";
+								break;
+						}
+						formula_count--;
+					}
+				}
+
 			}
 			else if(state == END_SCENE)
 			{
-
+                if(Collision.CollisionCheckPointToBox(_x,_y, m_cancle.GetX(), m_cancle.GetY(),
+                        m_cancle.GetX() + tile_x * 15, m_cancle.GetY() + tile_y * 8)){
+                    state = GAMESTART_SCENE;
+                }
 			}
 			else if(state == COLLECTION_SCENE)
 			{
-
+                if(Collision.CollisionCheckPointToBox(_x,_y, m_cancle.GetX(), m_cancle.GetY(),
+                        m_cancle.GetX() + tile_x * 15, m_cancle.GetY() + tile_y * 8)){
+                    state = GAMESTART_SCENE;
+                }
 			}
 
 
@@ -410,14 +552,19 @@ public class GameState implements IState {
 
 	public void ChangeBattleScene()
 	{
+		//MakeEnemy();
 		m_battleground.SetRectPosition(0,0, AppManager.getInstance().getWidth(), tile_y *30);
 		m_monster_1.SetPosition(tile_x*20, tile_y);
 		// button
-		m_plusButton.SetPosition(tile_x*5, tile_y*80);
-		m_minusButton.SetPosition(tile_x*30, tile_y*80);
-		m_mutipleButton.SetPosition(tile_x*55, tile_y*80);
-		m_divideButton.SetPosition(tile_x*80, tile_y*80);
-
+		m_plusButton.SetPosition(tile_x*5, tile_y*70);
+		m_minusButton.SetPosition(tile_x*30, tile_y*70);
+		m_mutipleButton.SetPosition(tile_x*55, tile_y*70);
+		m_divideButton.SetPosition(tile_x*80, tile_y*70);
+		m_cancle.SetPosition(tile_x*45, tile_y*85);
+		// progressbar
+        m_progressbar_empty.SetPosition(tile_x*10, tile_y*33);
+        m_progressbar_hp.SetRectPosition(tile_x*10, tile_y*33, tile_x*96, tile_y*35);
+        m_hp.SetPosition(tile_x*2, tile_y*32);
 	}
 
 	@Override
