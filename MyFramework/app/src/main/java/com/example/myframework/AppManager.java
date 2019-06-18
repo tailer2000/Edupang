@@ -1,6 +1,7 @@
 package com.example.myframework;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,7 +17,7 @@ public class AppManager {
 		// Application 의 Activity
 		private Activity m_activity;
 	    private Thread m_thread;
-		
+		private Context m_context;
 
 		// GameState
 		public GameState m_gamestate;
@@ -34,6 +35,7 @@ public class AppManager {
 			m_activity = _activity;
 		}
 		public void setThread(Thread _thread){m_thread = _thread; }
+		public void setContext(Context _context){m_context = _context;}
 		public Thread getThread(){ return m_thread; }
 		public GameView getGameView(){
 			return m_gameview;
@@ -44,6 +46,7 @@ public class AppManager {
 		public Activity getActivity(){
 			return m_activity;
 		}
+		public Context getContext() {return m_context;}
 		
 		public void setSize(int x,int y){
 			m_width = x;

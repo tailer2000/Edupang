@@ -42,7 +42,10 @@ public class Enemy extends SpriteAnimation {
 	public int GetHP(){
 		return hp;
 	}
-	
+	public void SetHp(int hp_) {
+		hp = hp_;
+	}
+
 	void Attack(){
 
 	}

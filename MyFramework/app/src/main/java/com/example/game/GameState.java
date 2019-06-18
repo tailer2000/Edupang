@@ -3,6 +3,7 @@ package com.example.game;
 import java.util.ArrayList;
 import java.util.Random;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -17,6 +18,7 @@ import com.example.myframework.CollisionManager;
 import com.example.myframework.GraphicObject;
 import com.example.myframework.IState;
 import com.example.myframework.R;
+import com.example.myframework.SoundManager;
 
 public class GameState implements IState {
 
@@ -50,7 +52,14 @@ public class GameState implements IState {
 	private GraphicObject m_divideButton;
 	private GraphicObject m_cancle;
 	private Enemy_1 m_monster_1;
+	private Enemy_1 m_monster_2;
+	private Enemy_1 m_monster_3;
+	private Enemy_1 m_monster_4;
+	private Enemy_1 m_monster_5;
 	private ArrayList<Enemy> m_monster_list = new ArrayList<Enemy>();
+	private Enemy m_monster;
+
+	private Context m_context;
 
     int currcount = 9999;
     int prevcount = 9999;
@@ -73,6 +82,14 @@ public class GameState implements IState {
 	
 	@Override
 	public void Init() throws Exception {
+
+		//사운드를 위한 컨텍스트 받아오기
+		//피피티 4장 보기
+		m_context = AppManager.getInstance().getContext();
+		SoundManager.getInstance().Init(m_context);
+
+
+
 		m_title = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.title));
 		// background
 		m_background = new BackGround(0);
@@ -86,6 +103,20 @@ public class GameState implements IState {
 		m_cancle = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.resetbutton));
 		// enemy
 		m_monster_1 = new Enemy_1();
+		m_monster_1.state = Enemy.STATE_NORMAL;
+
+		m_monster_2 = new Enemy_1();
+		m_monster_2.state = Enemy.STATE_OUT;
+
+		m_monster_3 = new Enemy_1();
+		m_monster_3.state = Enemy.STATE_OUT;
+
+		m_monster_4 = new Enemy_1();
+		m_monster_4.state = Enemy.STATE_OUT;
+
+		m_monster_5 = new Enemy_1();
+		m_monster_5.state = Enemy.STATE_OUT;
+
 		cal = new Calcultation();
 	}
 
@@ -106,42 +137,31 @@ public class GameState implements IState {
 	}
 
 	public void MakeEnemy(){
-		for(int i=0; i<10; ++i)
-		{
+
 			Random random = new Random();
 			int randInt = random.nextInt(5);
-
 			switch (randInt){
 				case 0:
-					Enemy_1 monster_1 = new Enemy_1();
-					monster_1.SetPosition(tile_x*20, tile_y);
-					m_monster_list.add(monster_1);
+					m_monster_1.SetHp(100);
+					m_monster_1.state = Enemy.STATE_NORMAL;
 					break;
 				case 1:
-					Enemy_1 monster_2 = new Enemy_1();
-					monster_2.SetPosition(tile_x*20, tile_y);
-					m_monster_list.add(monster_2);
+					m_monster_2.SetHp(100);
+					m_monster_2.state = Enemy.STATE_NORMAL;
 					break;
 				case 2:
-					Enemy_1 monster_3 = new Enemy_1();
-					monster_3.SetPosition(tile_x*20, tile_y);
-					m_monster_list.add(monster_3);
+					m_monster_3.SetHp(100);
+					m_monster_3.state = Enemy.STATE_NORMAL;
 					break;
 				case 3:
-					Enemy_1 monster_4 = new Enemy_1();
-					monster_4.SetPosition(tile_x*20, tile_y);
-					m_monster_list.add(monster_4);
+					m_monster_4.SetHp(100);
+					m_monster_4.state = Enemy.STATE_NORMAL;
 					break;
 				case 4:
-					Enemy_1 monster_5 = new Enemy_1();
-					monster_5.SetPosition(tile_x*20, tile_y);
-					m_monster_list.add(monster_5);
+					m_monster_5.SetHp(100);
+					m_monster_5.state = Enemy.STATE_NORMAL;
 					break;
 			}
-		}
-
-		m_monster_list.get(0).state = Enemy.STATE_NORMAL;
-
 	}
 
 	public void MakeTest() throws Exception {
@@ -162,12 +182,16 @@ public class GameState implements IState {
 		{
 			m_battleground.DrawRect(canvas);
 
-			//m_monster_1.Draw(canvas);
-
-			for(Enemy e : m_monster_list) {
-				if(e.state == Enemy.STATE_NORMAL)
-					e.Draw(canvas);
-			}
+			if(m_monster_1.state == Enemy.STATE_NORMAL)
+				m_monster_1.Draw(canvas);
+			else if(m_monster_2.state == Enemy.STATE_NORMAL)
+				m_monster_2.Draw(canvas);
+			else if(m_monster_3.state == Enemy.STATE_NORMAL)
+				m_monster_3.Draw(canvas);
+			else if(m_monster_4.state == Enemy.STATE_NORMAL)
+				m_monster_4.Draw(canvas);
+			else if(m_monster_5.state == Enemy.STATE_NORMAL)
+				m_monster_5.Draw(canvas);
 
 			// button
 			m_plusButton.Draw(canvas);
@@ -217,11 +241,30 @@ public class GameState implements IState {
 
 	public void RightAnwser() throws Exception {
 
-		if(m_monster_1.state != Enemy.STATE_OUT)
+		if(m_monster_1.state != Enemy.STATE_OUT) {
 			m_monster_1.Damage(25);
-		else
-		{
-			//몬스터 늘어나면 추가될 작정
+			if(m_monster_1.state == Enemy.STATE_OUT)
+				MakeEnemy();
+		}
+		else if (m_monster_2.state != Enemy.STATE_OUT){
+			m_monster_2.Damage(25);
+			if(m_monster_2.state == Enemy.STATE_OUT)
+				MakeEnemy();
+		}
+		else if (m_monster_3.state != Enemy.STATE_OUT){
+			m_monster_3.Damage(25);
+			if(m_monster_3.state == Enemy.STATE_OUT)
+				MakeEnemy();
+		}
+		else if (m_monster_4.state != Enemy.STATE_OUT){
+			m_monster_4.Damage(25);
+			if(m_monster_4.state == Enemy.STATE_OUT)
+				MakeEnemy();
+		}
+		else if (m_monster_5.state != Enemy.STATE_OUT){
+			m_monster_5.Damage(25);
+			if(m_monster_5.state == Enemy.STATE_OUT)
+				MakeEnemy();
 		}
 
 		formula_first = "";
@@ -242,7 +285,17 @@ public class GameState implements IState {
 		formula_count = 0;
 
 		//나중에 바꿀 곳
-		m_monster_1.Attack();
+		if(m_monster_1.state == Enemy.STATE_NORMAL)
+			m_monster_1.Attack();
+		else if(m_monster_2.state == Enemy.STATE_NORMAL)
+			m_monster_2.Attack();
+		else if(m_monster_3.state == Enemy.STATE_NORMAL)
+			m_monster_3.Attack();
+		else if(m_monster_4.state == Enemy.STATE_NORMAL)
+			m_monster_4.Attack();
+		else if(m_monster_5.state == Enemy.STATE_NORMAL)
+			m_monster_5.Attack();
+
 		prevcount = prevcount - 100;
 	}
 
@@ -259,13 +312,16 @@ public class GameState implements IState {
 		else if(state == BATTLE_SCENE)
 		{
 
-			//m_monster_1.Update(GameTime);
-
-			for(Enemy e : m_monster_list){
-				if(e.state == Enemy.STATE_NORMAL) {
-					e.Update(GameTime);
-				}
-			}
+			if(m_monster_1.state == Enemy.STATE_NORMAL)
+				m_monster_1.Update(GameTime);
+			else if(m_monster_2.state == Enemy.STATE_NORMAL)
+				m_monster_2.Update(GameTime);
+			else if(m_monster_3.state == Enemy.STATE_NORMAL)
+				m_monster_3.Update(GameTime);
+			else if(m_monster_3.state == Enemy.STATE_NORMAL)
+				m_monster_4.Update(GameTime);
+			else if(m_monster_3.state == Enemy.STATE_NORMAL)
+				m_monster_5.Update(GameTime);
 
 			Life_Timer();
 
@@ -511,6 +567,10 @@ public class GameState implements IState {
 	{
 		m_battleground.SetRectPosition(0,0, AppManager.getInstance().getWidth(), tile_y *30);
 		m_monster_1.SetPosition(tile_x*20, tile_y);
+		m_monster_2.SetPosition(tile_x*20, tile_y);
+		m_monster_3.SetPosition(tile_x*20, tile_y);
+		m_monster_4.SetPosition(tile_x*20, tile_y);
+		m_monster_5.SetPosition(tile_x*20, tile_y);
 
 		// button
 		m_plusButton.SetPosition(tile_x*5, tile_y*70);
