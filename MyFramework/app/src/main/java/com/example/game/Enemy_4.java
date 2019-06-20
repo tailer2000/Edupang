@@ -6,7 +6,7 @@ import com.example.myframework.R;
 public class Enemy_4 extends Enemy {
     public Enemy_4() {
         super(AppManager.getInstance().getBitmap(R.drawable.monster_4));
-        //this.InitSpriteData(900, 785, 1,4);
+        //this.InitSpriteData(900, 785, 1,11);
         state = Enemy.STATE_OUT;
         hp = 100;
     }
