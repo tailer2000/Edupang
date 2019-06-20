@@ -3,22 +3,21 @@ package com.example.game;
 import java.util.ArrayList;
 import java.util.Random;
 
-<<<<<<< HEAD
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-=======
 
 import android.content.Context;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
->>>>>>> 37ccc8e9dc09cd120a13f805131edb1d0301b5f9
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Debug;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -37,6 +36,8 @@ public class GameState implements IState {
 	public static final int BATTLE_SCENE = 1;
 	public static final int COLLECTION_SCENE = 2;
 	public static final int END_SCENE = 3;
+
+	public static final int BACKGROUND_MUSIC = 1;
 
 	private long m_LastShoot = System.currentTimeMillis();
 	private Player m_player;
@@ -65,8 +66,6 @@ public class GameState implements IState {
 	private GraphicObject m_mutipleButton;
 	private GraphicObject m_divideButton;
 	private GraphicObject m_cancle;
-<<<<<<< HEAD
-=======
 
 	// gallery
 	private GraphicObject m_monster1_gallery;
@@ -76,24 +75,16 @@ public class GameState implements IState {
 	private GraphicObject m_monster5_gallery;
 
 	// monsters
->>>>>>> 37ccc8e9dc09cd120a13f805131edb1d0301b5f9
 	private Enemy_1 m_monster_1;
 	private Enemy_1 m_monster_2;
 	private Enemy_1 m_monster_3;
 	private Enemy_1 m_monster_4;
 	private Enemy_1 m_monster_5;
 
-<<<<<<< HEAD
-    private GraphicObject m_progressbar_empty;
-    private GraphicObject m_progressbar_hp;
-    private GraphicObject m_hp;
-=======
-	// etc
     private GraphicObject m_progressbar_empty;
     private GraphicObject m_progressbar_hp;
     private GraphicObject m_hp;
 	private GraphicObject m_endicon;
->>>>>>> 37ccc8e9dc09cd120a13f805131edb1d0301b5f9
 
 	private ArrayList<Enemy> m_monster_list = new ArrayList<Enemy>();
 
@@ -126,16 +117,25 @@ public class GameState implements IState {
 	public void Init() throws Exception {
 
 		//사운드를 위한 컨텍스트 받아오기
-		//피피티 4장 보기
 		m_context = AppManager.getInstance().getContext();
+
+		//피피티 4장 보기
+		// 사운드
+		/*
+		final SoundPool sp = new SoundPool(1,         // 최대 음악파일의 개수
+				AudioManager.STREAM_MUSIC, // 스트림 타입
+				0);
+
+		final int soundID = sp.load(m_context, // 현재 화면의 제어권자
+				R.raw.back,    // 음악 파일
+				1);        // 우선순위
+
+		sp.play(soundID, 1, 1, 0, 0, 1);
+		*/
+
 		SoundManager.getInstance().Init(m_context);
-
-<<<<<<< HEAD
-		m_title = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.title));
-=======
-
-		//m_title = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.title));
->>>>>>> 37ccc8e9dc09cd120a13f805131edb1d0301b5f9
+		SoundManager.getInstance().addSound(BACKGROUND_MUSIC, R.raw.back);
+		SoundManager.getInstance().playLooped(BACKGROUND_MUSIC);
 
 		// background
 		m_title = new BackGround(0);
