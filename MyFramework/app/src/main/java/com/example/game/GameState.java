@@ -50,8 +50,7 @@ public class GameState implements IState {
 	//입력값 늦추기 위한 변수
 	private long afterTime = System.currentTimeMillis();
 
-	private GraphicObject m_keypad;
-    private GraphicObject m_shootpad;
+	// Button
     private GraphicObject m_startButton;
     private GraphicObject m_galleryButton;
     private GraphicObject m_quitButton;
@@ -60,25 +59,38 @@ public class GameState implements IState {
 	private GraphicObject m_mutipleButton;
 	private GraphicObject m_divideButton;
 	private GraphicObject m_cancle;
-	private GraphicObject m_endicon;
 
+	// gallery
+	private GraphicObject m_monster1_gallery;
+	private GraphicObject m_monster2_gallery;
+	private GraphicObject m_monster3_gallery;
+	private GraphicObject m_monster4_gallery;
+	private GraphicObject m_monster5_gallery;
+
+	// monsters
 	private Enemy_1 m_monster_1;
 	private Enemy_1 m_monster_2;
 	private Enemy_1 m_monster_3;
 	private Enemy_1 m_monster_4;
 	private Enemy_1 m_monster_5;
 
+	// etc
     private GraphicObject m_progressbar_empty;
     private GraphicObject m_progressbar_hp;
     private GraphicObject m_hp;
+	private GraphicObject m_endicon;
 
 	private ArrayList<Enemy> m_monster_list = new ArrayList<Enemy>();
-	private Enemy m_monster;
 
 	private Context m_context;
 
 	float current_hp_right = 0;
-
+	// IsCollect?
+	boolean m_monster1_collect = false;
+	boolean m_monster2_collect = false;
+	boolean m_monster3_collect = false;
+	boolean m_monster4_collect = false;
+	boolean m_monster5_collect = false;
 
 	public int m_score = 0;
 	public int tile_x = 0;
@@ -126,6 +138,13 @@ public class GameState implements IState {
         m_progressbar_empty = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.progressbar_empty));
         m_progressbar_hp = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.progressbar_hp));
         m_hp = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.heart));
+		// gallery
+        m_monster1_gallery = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.lock));
+		m_monster2_gallery = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.lock));
+		m_monster3_gallery = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.lock));
+		m_monster4_gallery = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.lock));
+		m_monster5_gallery = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.lock));
+
         // endscene
 		m_endicon = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.end_icon));
 		// enemy
@@ -267,6 +286,14 @@ public class GameState implements IState {
 		else if(state == COLLECTION_SCENE)
 		{
 		    m_gallery_background.Draw(canvas);
+
+		    // collection
+			m_monster1_gallery.DrawRect(canvas);
+			m_monster2_gallery.DrawRect(canvas);
+			m_monster3_gallery.DrawRect(canvas);
+			m_monster4_gallery.DrawRect(canvas);
+			m_monster5_gallery.DrawRect(canvas);
+
             m_cancle.Draw(canvas);
 		}
 
@@ -427,7 +454,11 @@ public class GameState implements IState {
 		}
 		else if(state == COLLECTION_SCENE)
 		{
-
+			m_monster1_gallery.SetRectPosition(tile_x*10, tile_y*25, tile_x*30, tile_y*35);
+			m_monster2_gallery.SetRectPosition(tile_x*40, tile_y*25, tile_x*60, tile_y*35);
+			m_monster3_gallery.SetRectPosition(tile_x*70, tile_y*25, tile_x*90, tile_y*35);
+			m_monster4_gallery.SetRectPosition(tile_x*10, tile_y*40, tile_x*30, tile_y*50);
+			m_monster5_gallery.SetRectPosition(tile_x*40, tile_y*40, tile_x*60, tile_y*50);
 		}
         //MakeEnemy();
         //CheckCollision();
