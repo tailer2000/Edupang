@@ -21,6 +21,8 @@ public class BackGround extends GraphicObject {
 			m_bitmap =AppManager.getInstance().getBitmap(R.drawable.gallery_background);
 		else if(backtype == 3)
 			m_bitmap =AppManager.getInstance().getBitmap(R.drawable.end);
+		else if(backtype == 4)
+			m_bitmap =AppManager.getInstance().getBitmap(R.drawable.gallery_background);
 	}
 
 	void Update(long GameTime){

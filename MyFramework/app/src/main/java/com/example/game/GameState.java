@@ -26,6 +26,7 @@ public class GameState implements IState {
 	public static final int BATTLE_SCENE = 1;
 	public static final int COLLECTION_SCENE = 2;
 	public static final int END_SCENE = 3;
+	public static final int PROFILE_SCENE = 4;
 
 	public static final int SELECT_SOUND = 1;
 	public static final int RIGHT_SOUND = 2;
@@ -37,6 +38,7 @@ public class GameState implements IState {
 	private BackGround m_background;
     private BackGround m_gallery_background;
     private BackGround m_end;
+	private BackGround m_gallery_collect;
 	private GraphicObject m_battleground;
 	// 계산기 대입
 	private Calcultation cal;
@@ -58,6 +60,7 @@ public class GameState implements IState {
 	private GraphicObject m_mutipleButton;
 	private GraphicObject m_divideButton;
 	private GraphicObject m_cancel;
+	private GraphicObject m_cancel2;
 	private GraphicObject m_home;
 
 	// gallery
@@ -72,9 +75,9 @@ public class GameState implements IState {
 	// monsters
 	private Enemy_1 m_monster_1;
 	private Enemy_2 m_monster_2;
-	private Enemy_1 m_monster_3;
-	private Enemy_1 m_monster_4;
-	private Enemy_1 m_monster_5;
+	private Enemy_3 m_monster_3;
+	private Enemy_4 m_monster_4;
+	private Enemy_5 m_monster_5;
 
     private GraphicObject m_progressbar_empty;
     private GraphicObject m_progressbar_hp;
@@ -110,34 +113,26 @@ public class GameState implements IState {
 		//사운드를 위한 컨텍스트 받아오기
 		m_context = AppManager.getInstance().getContext();
 
-		//피피티 4장 보기
-		// 사운드
-
 		final SoundPool sp = new SoundPool(1,         // 최대 음악파일의 개수
 				AudioManager.STREAM_MUSIC, // 스트림 타입
 				0);
-
 		final int soundID = sp.load(m_context, // 현재 화면의 제어권자
 				R.raw.back,    // 음악 파일
 				1);        // 우선순위
-
 		sp.play(soundID, 100, 100, 0, 0, 1);
-
-
-		//SoundManager.getInstance().Init(m_context);
-		//SoundManager.getInstance().addSound(BACKGROUND_MUSIC, R.raw.back);
-		//SoundManager.getInstance().playLooped(BACKGROUND_MUSIC);
 
 		// background
 		m_title = new BackGround(0);
 		m_background = new BackGround(1);
         m_gallery_background = new BackGround(2);
         m_end = new BackGround(3);
+		m_gallery_collect = new BackGround(4);
 		m_battleground = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.monsterground));
 		// button
 		m_startButton = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.gamestart));
         m_galleryButton = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.gallery));
         m_quitButton = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.gamequit));
+        m_cancel2 = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.cancel2));
         // button(battle)
 		m_plusButton = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.plus_released));
 		m_minusButton = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.minus_released));
@@ -167,13 +162,13 @@ public class GameState implements IState {
 		m_monster_2 = new Enemy_2();
 		m_monster_2.state = Enemy.STATE_OUT;
 
-		m_monster_3 = new Enemy_1();
+		m_monster_3 = new Enemy_3();
 		m_monster_3.state = Enemy.STATE_OUT;
 
-		m_monster_4 = new Enemy_1();
+		m_monster_4 = new Enemy_4();
 		m_monster_4.state = Enemy.STATE_OUT;
 
-		m_monster_5 = new Enemy_1();
+		m_monster_5 = new Enemy_5();
 		m_monster_5.state = Enemy.STATE_OUT;
 
 		cal = new Calcultation();
@@ -198,7 +193,7 @@ public class GameState implements IState {
 			m_endicon.SetRectPosition(tile_x*30, tile_y*20, tile_x*80, tile_y*70);
 			m_home.SetRectPosition(tile_x, tile_y, tile_x*12, tile_y*7);
 		}
-		current_hp_right = current_hp_right - 1;
+		current_hp_right = current_hp_right - 10;
         m_progressbar_hp.SetRectPosition(tile_x*10, tile_y*33, (int)current_hp_right, tile_y*35);
 	}
 
@@ -227,10 +222,6 @@ public class GameState implements IState {
 				case 4:
 					m_monster_5.SetHp(100);
 					m_monster_5.state = Enemy.STATE_NORMAL;
-
-					Enemy monster_1 = new Enemy_1();
-					monster_1.SetPosition(tile_x*20, tile_y);
-					m_monster_list.add(monster_1);
 					break;
 			}
 	}
@@ -316,6 +307,12 @@ public class GameState implements IState {
 
             m_home.DrawRect(canvas);
 		}
+		else if(state == PROFILE_SCENE)
+		{
+			m_gallery_collect.Draw(canvas);
+			m_profile1.DrawRect(canvas);
+			m_cancel2.DrawRect(canvas);
+		}
 	}
 
 	public void TileMap_Init()
@@ -339,7 +336,6 @@ public class GameState implements IState {
 			if(m_monster_2.GetHP() <= 0)
 				m_monster2_collect = true;
 			if(m_monster_2.state == Enemy.STATE_OUT){
-				m_monster2_collect = true;
 				MakeEnemy();
 			}
 
@@ -497,7 +493,6 @@ public class GameState implements IState {
 		}
 		else if(state == END_SCENE)
 		{
-
 		}
 		else if(state == COLLECTION_SCENE)
 		{
@@ -522,6 +517,10 @@ public class GameState implements IState {
 			if(m_monster5_collect == true) {
 				m_monster5_gallery.ChangeBitmap(AppManager.getInstance().getBitmap(R.drawable.unlock));
 			}
+		}
+		else if(state == PROFILE_SCENE)
+		{
+
 		}
     }
 
@@ -705,14 +704,20 @@ public class GameState implements IState {
 							m_home.GetX() + tile_x * 12, m_home.GetY() + tile_y * 7)) {
 						state = GAMESTART_SCENE;
 					}
-				}
 
-
-				if (Collision.CollisionCheckPointToBox(_x, _y, 40, 345, 80, 385)) {
+					if(m_monster1_collect == true) {
+						if (Collision.CollisionCheckPointToBox(_x, _y, m_monster1_gallery.GetX(), m_monster1_gallery.GetY(),
+								m_monster1_gallery.GetX() + tile_x * 20, m_monster1_gallery.GetY() + tile_y * 10)) {
+								state = PROFILE_SCENE;
+								m_profile1.SetRectPosition(tile_x*10, tile_y*20, tile_x*90, tile_y*80);
+								m_cancel2.SetRectPosition(tile_x*10, tile_y* 20, tile_x*22, tile_y*27);
+						}
+					}
+				} else if(state == PROFILE_SCENE){
+				if (Collision.CollisionCheckPointToBox(_x, _y, m_cancel2.GetX(), m_cancel2.GetY(),
+						m_cancel2.GetX() + tile_x * 20, m_cancel2.GetY() + tile_y * 10)) {
+					state = COLLECTION_SCENE;
 				}
-				if (Collision.CollisionCheckPointToBox(_x, _y, 80, 385, 120, 425)) {
-				}
-				if (Collision.CollisionCheckPointToBox(_x, _y, 40, 425, 80, 465)) {
 				}
 			}
 		return true;
