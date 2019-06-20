@@ -9,7 +9,7 @@ import com.example.myframework.SpriteAnimation;
 public class Effect_Explosion extends SpriteAnimation {
 
 	public Effect_Explosion(int x , int y) {
-		super(AppManager.getInstance().getBitmap(R.drawable.explosion));
+		super(AppManager.getInstance().getBitmap(R.drawable.heart));
 		this.InitSpriteData(104	, 66, 3, 6);
 		
 		m_x = x;

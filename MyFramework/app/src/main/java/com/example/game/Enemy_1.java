@@ -16,6 +16,17 @@ public class Enemy_1 extends Enemy {
     }
 
     @Override
+    public void Damage(int damage) {
+        if(hp > 0) {
+            hp -= damage;
+            System.out.println(String.valueOf(hp));
+        }
+        else{
+            state = STATE_OUT;
+        }
+    }
+
+    @Override
     public void Update(long GameTime) {
         super.Update(GameTime);
     }
