@@ -3,12 +3,12 @@ package com.example.game;
 import java.util.ArrayList;
 import java.util.Random;
 
-<<<<<<< HEAD
+
 import android.content.Context;
-=======
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
->>>>>>> fabbde377fd4c98ea96bb0dec490090f34667ac7
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -60,25 +60,24 @@ public class GameState implements IState {
 	private GraphicObject m_mutipleButton;
 	private GraphicObject m_divideButton;
 	private GraphicObject m_cancle;
-<<<<<<< HEAD
+	private GraphicObject m_endicon;
+
 	private Enemy_1 m_monster_1;
 	private Enemy_1 m_monster_2;
 	private Enemy_1 m_monster_3;
 	private Enemy_1 m_monster_4;
 	private Enemy_1 m_monster_5;
-=======
+
     private GraphicObject m_progressbar_empty;
     private GraphicObject m_progressbar_hp;
     private GraphicObject m_hp;
-	private Enemy m_monster_1;
->>>>>>> fabbde377fd4c98ea96bb0dec490090f34667ac7
+
 	private ArrayList<Enemy> m_monster_list = new ArrayList<Enemy>();
 	private Enemy m_monster;
 
 	private Context m_context;
 
-    int currcount = 99;
-    int prevcount = 99;
+	float current_hp_right = 0;
 
 
 	public int m_score = 0;
@@ -98,7 +97,6 @@ public class GameState implements IState {
 	
 	@Override
 	public void Init() throws Exception {
-<<<<<<< HEAD
 
 		//사운드를 위한 컨텍스트 받아오기
 		//피피티 4장 보기
@@ -106,10 +104,8 @@ public class GameState implements IState {
 		SoundManager.getInstance().Init(m_context);
 
 
+		//m_title = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.title));
 
-		m_title = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.title));
-=======
->>>>>>> fabbde377fd4c98ea96bb0dec490090f34667ac7
 		// background
 		m_title = new BackGround(0);
 		m_background = new BackGround(1);
@@ -130,6 +126,8 @@ public class GameState implements IState {
         m_progressbar_empty = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.progressbar_empty));
         m_progressbar_hp = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.progressbar_hp));
         m_hp = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.heart));
+        // endscene
+		m_endicon = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.end_icon));
 		// enemy
 		m_monster_1 = new Enemy_1();
 		m_monster_1.state = Enemy.STATE_NORMAL;
@@ -149,17 +147,16 @@ public class GameState implements IState {
 		cal = new Calcultation();
 	}
 
-    float current_hp_right = 0;
 	// 플레이어 체력 및 제한시간
 	public void Life_Timer(){
-		currcount = prevcount;
-		if(currcount > 0)
-			prevcount = prevcount - 1;
-		else if(currcount <= 0)
+		current_hp_right = m_progressbar_hp.GetRight();
+
+		if(current_hp_right <= 0)
 		{
 			state = END_SCENE;
+			m_endicon.SetRectPosition(tile_x*30, tile_y*20, tile_x*80, tile_y*70);
 		}
-		current_hp_right = (1 - (1/currcount))*tile_x*96;
+		current_hp_right = current_hp_right - 1;
         m_progressbar_hp.SetRectPosition(tile_x*10, tile_y*33, (int)current_hp_right, tile_y*35);
 	}
 
@@ -173,7 +170,6 @@ public class GameState implements IState {
 			int randInt = random.nextInt(5);
 			switch (randInt){
 				case 0:
-<<<<<<< HEAD
 					m_monster_1.SetHp(100);
 					m_monster_1.state = Enemy.STATE_NORMAL;
 					break;
@@ -192,31 +188,10 @@ public class GameState implements IState {
 				case 4:
 					m_monster_5.SetHp(100);
 					m_monster_5.state = Enemy.STATE_NORMAL;
-=======
+
 					Enemy monster_1 = new Enemy_1();
 					monster_1.SetPosition(tile_x*20, tile_y);
 					m_monster_list.add(monster_1);
-					break;
-				case 1:
-					Enemy monster_2 = new Enemy_2();
-					monster_2.SetPosition(tile_x*20, tile_y);
-					m_monster_list.add(monster_2);
-					break;
-				case 2:
-					Enemy monster_3 = new Enemy_3();
-					monster_3.SetPosition(tile_x*20, tile_y);
-					m_monster_list.add(monster_3);
-					break;
-				case 3:
-					Enemy monster_4 = new Enemy_4();
-					monster_4.SetPosition(tile_x*20, tile_y);
-					m_monster_list.add(monster_4);
-					break;
-				case 4:
-					Enemy monster_5 = new Enemy_5();
-					monster_5.SetPosition(tile_x*20, tile_y);
-					m_monster_list.add(monster_5);
->>>>>>> fabbde377fd4c98ea96bb0dec490090f34667ac7
 					break;
 			}
 	}
@@ -242,7 +217,6 @@ public class GameState implements IState {
 			m_background.Draw(canvas);
 			m_battleground.DrawRect(canvas);
 
-<<<<<<< HEAD
 			if(m_monster_1.state == Enemy.STATE_NORMAL)
 				m_monster_1.Draw(canvas);
 			else if(m_monster_2.state == Enemy.STATE_NORMAL)
@@ -253,14 +227,6 @@ public class GameState implements IState {
 				m_monster_4.Draw(canvas);
 			else if(m_monster_5.state == Enemy.STATE_NORMAL)
 				m_monster_5.Draw(canvas);
-=======
-			m_monster_1.Draw(canvas);
-
-			for(Enemy e : m_monster_list) {
-				if(e.state == Enemy.STATE_NORMAL)
-					e.Draw(canvas);
-			}
->>>>>>> fabbde377fd4c98ea96bb0dec490090f34667ac7
 
 			// button
 			m_plusButton.Draw(canvas);
@@ -295,6 +261,7 @@ public class GameState implements IState {
 		else if(state == END_SCENE)
 		{
 		    m_end.Draw(canvas);
+		    m_endicon.DrawRect(canvas);
             m_cancle.Draw(canvas);
 		}
 		else if(state == COLLECTION_SCENE)
@@ -346,7 +313,7 @@ public class GameState implements IState {
 		formula_four = "";
 		formula_count = 0;
 		MakeTest();
-		prevcount = prevcount + 100;
+		current_hp_right = m_progressbar_hp.GetRight() + 30;
 	}
 
 	public void WrongAnwser()
@@ -369,7 +336,7 @@ public class GameState implements IState {
 		else if(m_monster_5.state == Enemy.STATE_NORMAL)
 			m_monster_5.Attack();
 
-		prevcount = prevcount - 100;
+		current_hp_right = m_progressbar_hp.GetRight() - 20;
 	}
 
     @Override
@@ -385,8 +352,6 @@ public class GameState implements IState {
 		}
 		else if(state == BATTLE_SCENE)
 		{
-
-<<<<<<< HEAD
 			if(m_monster_1.state == Enemy.STATE_NORMAL)
 				m_monster_1.Update(GameTime);
 			else if(m_monster_2.state == Enemy.STATE_NORMAL)
@@ -397,15 +362,7 @@ public class GameState implements IState {
 				m_monster_4.Update(GameTime);
 			else if(m_monster_3.state == Enemy.STATE_NORMAL)
 				m_monster_5.Update(GameTime);
-=======
-			m_monster_1.Update(GameTime);
 
-			for(Enemy e : m_monster_list){
-				if(e.state == Enemy.STATE_NORMAL) {
-					e.Update(GameTime);
-				}
-			}
->>>>>>> fabbde377fd4c98ea96bb0dec490090f34667ac7
 
 			Life_Timer();
 
@@ -667,14 +624,11 @@ public class GameState implements IState {
 		//MakeEnemy();
 		m_battleground.SetRectPosition(0,0, AppManager.getInstance().getWidth(), tile_y *30);
 		m_monster_1.SetPosition(tile_x*20, tile_y);
-<<<<<<< HEAD
 		m_monster_2.SetPosition(tile_x*20, tile_y);
 		m_monster_3.SetPosition(tile_x*20, tile_y);
 		m_monster_4.SetPosition(tile_x*20, tile_y);
 		m_monster_5.SetPosition(tile_x*20, tile_y);
 
-=======
->>>>>>> fabbde377fd4c98ea96bb0dec490090f34667ac7
 		// button
 		m_plusButton.SetPosition(tile_x*5, tile_y*70);
 		m_minusButton.SetPosition(tile_x*30, tile_y*70);
