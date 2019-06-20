@@ -6,14 +6,14 @@ import com.example.myframework.R;
 public class Enemy_5 extends Enemy {
     public Enemy_5() {
         super(AppManager.getInstance().getBitmap(R.drawable.monster_5));
-        this.InitSpriteData(900, 785, 1,54);
+        this.InitSpriteData(900, 785, 1,4);
         state = Enemy.STATE_OUT;
-        hp = 100;
+        hp = 125;
     }
 
     @Override
     public void Damage(int damage) {
-        if(hp > 0) {
+        if(hp > damage) {
             hp -= damage;
             System.out.println(String.valueOf(hp));
         }

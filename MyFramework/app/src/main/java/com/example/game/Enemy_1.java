@@ -16,7 +16,7 @@ public class Enemy_1 extends Enemy {
 
     @Override
     public void Damage(int damage) {
-        if(hp > 0) {
+        if(hp > damage) {
             hp -= damage;
             System.out.println(String.valueOf(hp));
         }

@@ -193,7 +193,7 @@ public class GameState implements IState {
 			m_endicon.SetRectPosition(tile_x*30, tile_y*20, tile_x*80, tile_y*70);
 			m_home.SetRectPosition(tile_x, tile_y, tile_x*12, tile_y*7);
 		}
-		current_hp_right = current_hp_right - 10;
+		current_hp_right = current_hp_right - 1;
         m_progressbar_hp.SetRectPosition(tile_x*10, tile_y*33, (int)current_hp_right, tile_y*35);
 	}
 
@@ -202,6 +202,8 @@ public class GameState implements IState {
 
 			Random random = new Random();
 			int randInt = random.nextInt(5);
+			System.out.println("make enemy is " + randInt);
+
 			switch (randInt){
 				case 0:
 					m_monster_1.SetHp(25);
@@ -212,7 +214,7 @@ public class GameState implements IState {
 					m_monster_2.state = Enemy.STATE_NORMAL;
 					break;
 				case 2:
-					m_monster_3.SetHp(100);
+					m_monster_3.SetHp(75);
 					m_monster_3.state = Enemy.STATE_NORMAL;
 					break;
 				case 3:
@@ -220,7 +222,7 @@ public class GameState implements IState {
 					m_monster_4.state = Enemy.STATE_NORMAL;
 					break;
 				case 4:
-					m_monster_5.SetHp(100);
+					m_monster_5.SetHp(125);
 					m_monster_5.state = Enemy.STATE_NORMAL;
 					break;
 			}
@@ -328,6 +330,7 @@ public class GameState implements IState {
 			if(m_monster_1.GetHP() <= 0)
 				m_monster1_collect = true;
 			if(m_monster_1.state == Enemy.STATE_OUT) {
+				System.out.println("MakeEnemy");
 				MakeEnemy();
 			}
 		}
@@ -562,7 +565,8 @@ public class GameState implements IState {
 					android.os.Process.killProcess(android.os.Process.myPid());
 				}
 
-			} else if (state == BATTLE_SCENE) {
+			}
+			else if (state == BATTLE_SCENE) {
 				//click plus button
 				if (Collision.CollisionCheckPointToBox(_x, _y, m_plusButton.GetX(), m_plusButton.GetY(),
 						m_plusButton.GetX() + tile_x * 15, m_plusButton.GetY() + tile_y * 8)) {
@@ -694,30 +698,37 @@ public class GameState implements IState {
 					}
 				}
 
-				} else if (state == END_SCENE) {
+				}
+				else if (state == END_SCENE) {
 					if (Collision.CollisionCheckPointToBox(_x, _y, m_home.GetX(), m_home.GetY(),
 							m_home.GetX() + tile_x * 12, m_home.GetY() + tile_y * 7)) {
 						state = GAMESTART_SCENE;
 					}
-				} else if (state == COLLECTION_SCENE) {
+				}
+				else if (state == COLLECTION_SCENE) {
+
+					if(m_monster1_collect == true) {
+						if (Collision.CollisionCheckPointToBox(_x, _y, m_monster1_gallery.GetLeft(), m_monster1_gallery.GetTop(),
+								m_monster1_gallery.GetRight(), m_monster1_gallery.GetBottom())) {
+							System.out.println("PROFILE_SCENE");
+							state = PROFILE_SCENE;
+							m_profile1.SetRectPosition(tile_x*10, tile_y*20, tile_x*90, tile_y*80);
+							m_cancel2.SetRectPosition(tile_x*10, tile_y* 20, tile_x*22, tile_y*27);
+						}
+					}
+
 					if (Collision.CollisionCheckPointToBox(_x, _y, m_home.GetX(), m_home.GetY(),
 							m_home.GetX() + tile_x * 12, m_home.GetY() + tile_y * 7)) {
 						state = GAMESTART_SCENE;
 					}
 
-					if(m_monster1_collect == true) {
-						if (Collision.CollisionCheckPointToBox(_x, _y, m_monster1_gallery.GetX(), m_monster1_gallery.GetY(),
-								m_monster1_gallery.GetX() + tile_x * 20, m_monster1_gallery.GetY() + tile_y * 10)) {
-								state = PROFILE_SCENE;
-								m_profile1.SetRectPosition(tile_x*10, tile_y*20, tile_x*90, tile_y*80);
-								m_cancel2.SetRectPosition(tile_x*10, tile_y* 20, tile_x*22, tile_y*27);
-						}
-					}
-				} else if(state == PROFILE_SCENE){
-				if (Collision.CollisionCheckPointToBox(_x, _y, m_cancel2.GetX(), m_cancel2.GetY(),
-						m_cancel2.GetX() + tile_x * 20, m_cancel2.GetY() + tile_y * 10)) {
-					state = COLLECTION_SCENE;
 				}
+				else if(state == PROFILE_SCENE){
+					if (Collision.CollisionCheckPointToBox(_x, _y, m_cancel2.GetLeft(), m_cancel2.GetTop(),
+							m_cancel2.GetRight(), m_cancel2.GetBottom())) {
+						System.out.println("COLLECTION_SCENE");
+						state = COLLECTION_SCENE;
+					}
 				}
 			}
 		return true;
@@ -725,6 +736,12 @@ public class GameState implements IState {
 
 	public void ChangeBattleScene()
 	{
+		formula_first = "";
+		formula_second = "";
+		formula_third = "";
+		formula_four = "";
+		formula_count = 0;
+
 		//MakeEnemy();
 		m_battleground.SetRectPosition(0,0, AppManager.getInstance().getWidth(), tile_y *30);
 		m_monster_1.SetPosition(tile_x*20, tile_y);

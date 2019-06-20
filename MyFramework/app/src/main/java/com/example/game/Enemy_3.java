@@ -6,9 +6,9 @@ import com.example.myframework.R;
 public class Enemy_3 extends Enemy {
     public Enemy_3() {
         super(AppManager.getInstance().getBitmap(R.drawable.monster_3));
-        this.InitSpriteData(900, 785, 1,8);
+        this.InitSpriteData(900, 785, 1,4);
         state = Enemy.STATE_OUT;
-        hp = 100;
+        hp = 75;
     }
 
     @Override
@@ -18,7 +18,7 @@ public class Enemy_3 extends Enemy {
 
     @Override
     public void Damage(int damage) {
-        if(hp > 0) {
+        if(hp > damage) {
             hp -= damage;
             System.out.println(String.valueOf(hp));
         }
