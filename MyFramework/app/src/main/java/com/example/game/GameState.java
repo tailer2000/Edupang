@@ -3,12 +3,9 @@ package com.example.game;
 import java.util.ArrayList;
 import java.util.Random;
 
-<<<<<<< HEAD
 import android.content.Context;
-=======
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
->>>>>>> fabbde377fd4c98ea96bb0dec490090f34667ac7
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -60,18 +57,16 @@ public class GameState implements IState {
 	private GraphicObject m_mutipleButton;
 	private GraphicObject m_divideButton;
 	private GraphicObject m_cancle;
-<<<<<<< HEAD
 	private Enemy_1 m_monster_1;
 	private Enemy_1 m_monster_2;
 	private Enemy_1 m_monster_3;
 	private Enemy_1 m_monster_4;
 	private Enemy_1 m_monster_5;
-=======
+
     private GraphicObject m_progressbar_empty;
     private GraphicObject m_progressbar_hp;
     private GraphicObject m_hp;
-	private Enemy m_monster_1;
->>>>>>> fabbde377fd4c98ea96bb0dec490090f34667ac7
+
 	private ArrayList<Enemy> m_monster_list = new ArrayList<Enemy>();
 	private Enemy m_monster;
 
@@ -98,18 +93,14 @@ public class GameState implements IState {
 	
 	@Override
 	public void Init() throws Exception {
-<<<<<<< HEAD
 
 		//사운드를 위한 컨텍스트 받아오기
 		//피피티 4장 보기
 		m_context = AppManager.getInstance().getContext();
 		SoundManager.getInstance().Init(m_context);
 
-
-
 		m_title = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.title));
-=======
->>>>>>> fabbde377fd4c98ea96bb0dec490090f34667ac7
+
 		// background
 		m_title = new BackGround(0);
 		m_background = new BackGround(1);
