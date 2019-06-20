@@ -3,6 +3,7 @@ package com.example.myframework;
 
 import android.content.Context;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
 
 import java.util.HashMap;
@@ -17,6 +18,8 @@ public class SoundManager {
     private HashMap             m_SoundPoolMap;
     private AudioManager        m_AudioManager;
     private Context             m_Activity;
+
+    public MediaPlayer m_Background;
 
     public static SoundManager getInstance(){
         if( s_instance == null ){
@@ -36,6 +39,10 @@ public class SoundManager {
         m_SoundPoolMap = new HashMap();
         m_AudioManager = (AudioManager) _context.getSystemService(Context.AUDIO_SERVICE);
         m_Activity = _context;
+
+        m_Background = MediaPlayer.create(m_Activity, R.raw.gameplay_back);
+        m_Background.setLooping(true);
+        m_Background.setVolume(0.25f, 0.25f);
     }
 
     public void addSound(int _index, int _soundID){

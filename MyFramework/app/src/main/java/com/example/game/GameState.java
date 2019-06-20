@@ -27,7 +27,11 @@ public class GameState implements IState {
 	public static final int COLLECTION_SCENE = 2;
 	public static final int END_SCENE = 3;
 
-	public static final int BACKGROUND_MUSIC = 1;
+	public static final int SELECT_SOUND = 1;
+	public static final int RIGHT_SOUND = 2;
+	public static final int WRONG_SOUND = 3;
+	public static final int START_SOUND = 4;
+	public static final int RESET_SOUND = 5;
 
 	private BackGround m_title;
 	private BackGround m_background;
@@ -124,7 +128,6 @@ public class GameState implements IState {
 		//SoundManager.getInstance().addSound(BACKGROUND_MUSIC, R.raw.back);
 		//SoundManager.getInstance().playLooped(BACKGROUND_MUSIC);
 
-
 		// background
 		m_title = new BackGround(0);
 		m_background = new BackGround(1);
@@ -174,6 +177,15 @@ public class GameState implements IState {
 		m_monster_5.state = Enemy.STATE_OUT;
 
 		cal = new Calcultation();
+
+		SoundManager.getInstance().Init(m_context);
+		SoundManager.getInstance().addSound(SELECT_SOUND, R.raw.select_e_05);
+		SoundManager.getInstance().addSound(RIGHT_SOUND, R.raw.great);
+		SoundManager.getInstance().addSound(WRONG_SOUND, R.raw.tryagain);
+		SoundManager.getInstance().addSound(RESET_SOUND, R.raw.cancel_a_01);
+		SoundManager.getInstance().addSound(START_SOUND, R.raw.ok_003_05);
+
+		SoundManager.getInstance().m_Background.start();
 	}
 
 	// 플레이어 체력 및 제한시간
@@ -313,7 +325,7 @@ public class GameState implements IState {
 	}
 
 	public void RightAnwser() throws Exception {
-
+		SoundManager.getInstance().play(RIGHT_SOUND);
 		if(m_monster_1.state != Enemy.STATE_OUT) {
 			m_monster_1.Damage(25);
 			if(m_monster_1.GetHP() <= 0)
@@ -369,6 +381,7 @@ public class GameState implements IState {
 
 	public void WrongAnwser()
 	{
+		SoundManager.getInstance().play(WRONG_SOUND);
 		formula_first = "";
 		formula_second = "";
 		formula_third = "";
@@ -460,7 +473,17 @@ public class GameState implements IState {
 
 				str +=  String.valueOf(numList.get(4));
 
-				if(cal.GetRealAnwser() == Integer.valueOf(cal.bracketCalMain(str))){
+				int val = 0;
+				try {
+					if(Float.valueOf(cal.bracketCalMain(str)) % 1.0 != 0)
+						val = -100;
+					val = Math.round(Float.valueOf(cal.bracketCalMain(str)));
+				}
+				catch (NumberFormatException nfe){
+					val = -100;
+				}
+
+				if(cal.GetRealAnwser() == val){
 					System.out.println("정답");
 					RightAnwser();
 				}
@@ -507,48 +530,49 @@ public class GameState implements IState {
 		return false;
 	}
 
-
-	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 
 		long CurruntTime = System.currentTimeMillis();
-		if(CurruntTime - afterTime < 100)
+		if (CurruntTime - afterTime < 100)
 			return false;
 		afterTime = CurruntTime;
 
-		for(int i =0; i<event.getPointerCount();i++){
+		for (int i = 0; i < event.getPointerCount(); i++) {
 			int _x = (int) event.getX(i);
 			int _y = (int) event.getY(i);
 
-			if(state == GAMESTART_SCENE)
-			{
+			if (state == GAMESTART_SCENE) {
 				//click start button
-				if(Collision.CollisionCheckPointToBox(_x,_y, m_startButton.GetX(), m_startButton.GetY(),
-						m_startButton.GetX() + tile_x * 35, m_startButton.GetY() + tile_y * 7)){
+				if (Collision.CollisionCheckPointToBox(_x, _y, m_startButton.GetX(), m_startButton.GetY(),
+						m_startButton.GetX() + tile_x * 35, m_startButton.GetY() + tile_y * 7)) {
+
+					SoundManager.getInstance().play(START_SOUND);
 					state = BATTLE_SCENE;
 					ChangeBattleScene();
 				}
 				// click galleryButton
-                if(Collision.CollisionCheckPointToBox(_x,_y, m_galleryButton.GetX(), m_galleryButton.GetY(),
-                        m_galleryButton.GetX() + tile_x * 35, m_galleryButton.GetY() + tile_y * 7)){
-                    state = COLLECTION_SCENE;
-					m_home.SetRectPosition(tile_x, tile_y, tile_x*12, tile_y*7);
-                }
-                // click quitButton
-                if(Collision.CollisionCheckPointToBox(_x,_y, m_quitButton.GetX(), m_quitButton.GetY(),
-                        m_quitButton.GetX() + tile_x * 35, m_quitButton.GetY() + tile_y * 7)){
-                    android.os.Process.killProcess(android.os.Process.myPid());
-                }
+				if (Collision.CollisionCheckPointToBox(_x, _y, m_galleryButton.GetX(), m_galleryButton.GetY(),
+						m_galleryButton.GetX() + tile_x * 35, m_galleryButton.GetY() + tile_y * 7)) {
+					state = COLLECTION_SCENE;
+					m_home.SetRectPosition(tile_x, tile_y, tile_x * 12, tile_y * 7);
+				}
+				// click quitButton
+				if (Collision.CollisionCheckPointToBox(_x, _y, m_quitButton.GetX(), m_quitButton.GetY(),
+						m_quitButton.GetX() + tile_x * 35, m_quitButton.GetY() + tile_y * 7)) {
+					android.os.Process.killProcess(android.os.Process.myPid());
+				}
 
-			}
-			else if(state == BATTLE_SCENE)
-			{
+			} else if (state == BATTLE_SCENE) {
 				//click plus button
-				if(Collision.CollisionCheckPointToBox(_x,_y, m_plusButton.GetX(), m_plusButton.GetY(),
-						m_plusButton.GetX() + tile_x * 15, m_plusButton.GetY() + tile_y * 8)){
-					if(formula_count < 4){
-						switch (formula_count){
+				if (Collision.CollisionCheckPointToBox(_x, _y, m_plusButton.GetX(), m_plusButton.GetY(),
+						m_plusButton.GetX() + tile_x * 15, m_plusButton.GetY() + tile_y * 8)) {
+
+					//m_plusButton.ChangeBitmap(AppManager.getInstance().getBitmap(R.drawable.plus_click));
+					SoundManager.getInstance().play(SELECT_SOUND);
+
+					if (formula_count < 4) {
+						switch (formula_count) {
 							case 0:
 								formula_first = "+";
 								break;
@@ -567,10 +591,14 @@ public class GameState implements IState {
 
 				}
 				//click minus button
-				if(Collision.CollisionCheckPointToBox(_x,_y, m_minusButton.GetX(), m_minusButton.GetY(),
-						m_minusButton.GetX() + tile_x * 15, m_minusButton.GetY() + tile_y * 8)){
-					if(formula_count < 4){
-						switch (formula_count){
+				if (Collision.CollisionCheckPointToBox(_x, _y, m_minusButton.GetX(), m_minusButton.GetY(),
+						m_minusButton.GetX() + tile_x * 15, m_minusButton.GetY() + tile_y * 8)) {
+
+					//m_minusButton.ChangeBitmap(AppManager.getInstance().getBitmap(R.drawable.minus_click));
+					SoundManager.getInstance().play(SELECT_SOUND);
+
+					if (formula_count < 4) {
+						switch (formula_count) {
 							case 0:
 								formula_first = "-";
 								break;
@@ -589,10 +617,14 @@ public class GameState implements IState {
 
 				}
 				//click multiple button
-				if(Collision.CollisionCheckPointToBox(_x,_y, m_mutipleButton.GetX(), m_mutipleButton.GetY(),
-						m_mutipleButton.GetX() + tile_x * 15, m_mutipleButton.GetY() + tile_y * 8)){
-					if(formula_count < 4){
-						switch (formula_count){
+				if (Collision.CollisionCheckPointToBox(_x, _y, m_mutipleButton.GetX(), m_mutipleButton.GetY(),
+						m_mutipleButton.GetX() + tile_x * 15, m_mutipleButton.GetY() + tile_y * 8)) {
+
+					//m_mutipleButton.ChangeBitmap(AppManager.getInstance().getBitmap(R.drawable.multiple_click));
+					SoundManager.getInstance().play(SELECT_SOUND);
+
+					if (formula_count < 4) {
+						switch (formula_count) {
 							case 0:
 								formula_first = "×";
 								break;
@@ -610,11 +642,14 @@ public class GameState implements IState {
 					}
 				}
 				//click divide button
-				if(Collision.CollisionCheckPointToBox(_x,_y, m_divideButton.GetX(), m_divideButton.GetY(),
-						m_divideButton.GetX() + tile_x * 15, m_divideButton.GetY() + tile_y * 8)){
+				if (Collision.CollisionCheckPointToBox(_x, _y, m_divideButton.GetX(), m_divideButton.GetY(),
+						m_divideButton.GetX() + tile_x * 15, m_divideButton.GetY() + tile_y * 8)) {
 
-					if(formula_count < 4){
-						switch (formula_count){
+					//m_divideButton.ChangeBitmap(AppManager.getInstance().getBitmap(R.drawable.divide_click));
+					SoundManager.getInstance().play(SELECT_SOUND);
+
+					if (formula_count < 4) {
+						switch (formula_count) {
 							case 0:
 								formula_first = "÷";
 								break;
@@ -632,51 +667,54 @@ public class GameState implements IState {
 					}
 				}
 
-				if(Collision.CollisionCheckPointToBox(_x,_y, m_cancel.GetX(), m_cancel.GetY(),
-						m_cancel.GetX() + tile_x * 15, m_cancel.GetY() + tile_y * 8)){
-					if(formula_count > 0){
-						switch (formula_count){
-							case 1:
-								formula_first = "";
-								break;
-							case 2:
-								formula_second = "";
-								break;
-							case 3:
-								formula_third = "";
-								break;
-							case 4:
-								formula_four = "";
-								break;
+
+				if (Collision.CollisionCheckPointToBox(_x, _y, m_cancel.GetX(), m_cancel.GetY(),
+						m_cancel.GetX() + tile_x * 15, m_cancel.GetY() + tile_y * 8)) {
+
+					if (Collision.CollisionCheckPointToBox(_x, _y, m_cancel.GetX(), m_cancel.GetY(),
+							m_cancel.GetX() + tile_x * 15, m_cancel.GetY() + tile_y * 8)) {
+						SoundManager.getInstance().play(RESET_SOUND);
+
+						if (formula_count > 0) {
+							switch (formula_count) {
+								case 1:
+									formula_first = "";
+									break;
+								case 2:
+									formula_second = "";
+									break;
+								case 3:
+									formula_third = "";
+									break;
+								case 4:
+									formula_four = "";
+									break;
+							}
+							formula_count--;
 						}
-						formula_count--;
 					}
 				}
 
-			}
-			else if(state == END_SCENE)
-			{
-                if(Collision.CollisionCheckPointToBox(_x,_y, m_home.GetX(), m_home.GetY(),
-                        m_home.GetX() + tile_x * 12, m_home.GetY() + tile_y * 7)){
-                    state = GAMESTART_SCENE;
-                }
-			}
-			else if(state == COLLECTION_SCENE)
-			{
-                if(Collision.CollisionCheckPointToBox(_x,_y, m_home.GetX(), m_home.GetY(),
-                        m_home.GetX() + tile_x * 12, m_home.GetY() + tile_y * 7)){
-                    state = GAMESTART_SCENE;
-                }
-			}
+				} else if (state == END_SCENE) {
+					if (Collision.CollisionCheckPointToBox(_x, _y, m_home.GetX(), m_home.GetY(),
+							m_home.GetX() + tile_x * 12, m_home.GetY() + tile_y * 7)) {
+						state = GAMESTART_SCENE;
+					}
+				} else if (state == COLLECTION_SCENE) {
+					if (Collision.CollisionCheckPointToBox(_x, _y, m_home.GetX(), m_home.GetY(),
+							m_home.GetX() + tile_x * 12, m_home.GetY() + tile_y * 7)) {
+						state = GAMESTART_SCENE;
+					}
+				}
 
 
-			if(Collision.CollisionCheckPointToBox(_x,_y, 40, 345, 80, 385)){
+				if (Collision.CollisionCheckPointToBox(_x, _y, 40, 345, 80, 385)) {
+				}
+				if (Collision.CollisionCheckPointToBox(_x, _y, 80, 385, 120, 425)) {
+				}
+				if (Collision.CollisionCheckPointToBox(_x, _y, 40, 425, 80, 465)) {
+				}
 			}
-			if(Collision.CollisionCheckPointToBox(_x,_y, 80, 385, 120, 425)){
-			}
-			if(Collision.CollisionCheckPointToBox(_x,_y, 40, 425, 80, 465)){
-			}
-		}
 		return true;
 	}
 
