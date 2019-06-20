@@ -58,7 +58,8 @@ public class GameState implements IState {
 	private GraphicObject m_minusButton;
 	private GraphicObject m_mutipleButton;
 	private GraphicObject m_divideButton;
-	private GraphicObject m_cancle;
+	private GraphicObject m_cancel;
+	private GraphicObject m_home;
 
 	// gallery
 	private GraphicObject m_monster1_gallery;
@@ -69,7 +70,7 @@ public class GameState implements IState {
 
 	// monsters
 	private Enemy_1 m_monster_1;
-	private Enemy_1 m_monster_2;
+	private Enemy_2 m_monster_2;
 	private Enemy_1 m_monster_3;
 	private Enemy_1 m_monster_4;
 	private Enemy_1 m_monster_5;
@@ -95,6 +96,7 @@ public class GameState implements IState {
 	public int m_score = 0;
 	public int tile_x = 0;
 	public int tile_y = 0;
+	public int m_monster_hp;
 
 	public int state = GAMESTART_SCENE;
 
@@ -115,9 +117,6 @@ public class GameState implements IState {
 		m_context = AppManager.getInstance().getContext();
 		SoundManager.getInstance().Init(m_context);
 
-
-		//m_title = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.title));
-
 		// background
 		m_title = new BackGround(0);
 		m_background = new BackGround(1);
@@ -133,7 +132,8 @@ public class GameState implements IState {
 		m_minusButton = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.minus_released));
 		m_mutipleButton = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.multiple_released));
 		m_divideButton = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.divide_released));
-		m_cancle = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.resetbutton));
+		m_cancel = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.resetbutton));
+		m_home = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.home));
 		// Time & HP
         m_progressbar_empty = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.progressbar_empty));
         m_progressbar_hp = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.progressbar_hp));
@@ -151,7 +151,7 @@ public class GameState implements IState {
 		m_monster_1 = new Enemy_1();
 		m_monster_1.state = Enemy.STATE_NORMAL;
 
-		m_monster_2 = new Enemy_1();
+		m_monster_2 = new Enemy_2();
 		m_monster_2.state = Enemy.STATE_OUT;
 
 		m_monster_3 = new Enemy_1();
@@ -189,11 +189,11 @@ public class GameState implements IState {
 			int randInt = random.nextInt(5);
 			switch (randInt){
 				case 0:
-					m_monster_1.SetHp(100);
+					m_monster_1.SetHp(25);
 					m_monster_1.state = Enemy.STATE_NORMAL;
 					break;
 				case 1:
-					m_monster_2.SetHp(100);
+					m_monster_2.SetHp(50);
 					m_monster_2.state = Enemy.STATE_NORMAL;
 					break;
 				case 2:
@@ -252,7 +252,7 @@ public class GameState implements IState {
 			m_divideButton.Draw(canvas);
 			m_mutipleButton.Draw(canvas);
 			m_minusButton.Draw(canvas);
-			m_cancle.Draw(canvas);
+			m_cancel.Draw(canvas);
 
 			// Life_Timer
             m_progressbar_empty.Draw(canvas);
@@ -281,7 +281,7 @@ public class GameState implements IState {
 		{
 		    m_end.Draw(canvas);
 		    m_endicon.DrawRect(canvas);
-            m_cancle.Draw(canvas);
+            m_home.Draw(canvas);
 		}
 		else if(state == COLLECTION_SCENE)
 		{
@@ -294,7 +294,7 @@ public class GameState implements IState {
 			m_monster4_gallery.DrawRect(canvas);
 			m_monster5_gallery.DrawRect(canvas);
 
-            m_cancle.Draw(canvas);
+            m_home.Draw(canvas);
 		}
 
 		//canvas.drawText("Score :"+String.valueOf(m_score),0,40,p);
@@ -310,28 +310,39 @@ public class GameState implements IState {
 
 		if(m_monster_1.state != Enemy.STATE_OUT) {
 			m_monster_1.Damage(25);
-			if(m_monster_1.state == Enemy.STATE_OUT)
+			if(m_monster_1.state == Enemy.STATE_OUT) {
+				m_monster1_collect = true;
 				MakeEnemy();
+			}
 		}
 		else if (m_monster_2.state != Enemy.STATE_OUT){
 			m_monster_2.Damage(25);
-			if(m_monster_2.state == Enemy.STATE_OUT)
+			if(m_monster_2.state == Enemy.STATE_OUT){
+				m_monster2_collect = true;
 				MakeEnemy();
+			}
+
 		}
 		else if (m_monster_3.state != Enemy.STATE_OUT){
 			m_monster_3.Damage(25);
-			if(m_monster_3.state == Enemy.STATE_OUT)
+			if(m_monster_3.state == Enemy.STATE_OUT){
+				m_monster3_collect = true;
 				MakeEnemy();
+			}
 		}
 		else if (m_monster_4.state != Enemy.STATE_OUT){
 			m_monster_4.Damage(25);
-			if(m_monster_4.state == Enemy.STATE_OUT)
+			if(m_monster_4.state == Enemy.STATE_OUT) {
+				m_monster4_collect = true;
 				MakeEnemy();
+			}
 		}
 		else if (m_monster_5.state != Enemy.STATE_OUT){
 			m_monster_5.Damage(25);
-			if(m_monster_5.state == Enemy.STATE_OUT)
+			if(m_monster_5.state == Enemy.STATE_OUT) {
+				m_monster5_collect = true;
 				MakeEnemy();
+			}
 		}
 
 		formula_first = "";
@@ -459,6 +470,17 @@ public class GameState implements IState {
 			m_monster3_gallery.SetRectPosition(tile_x*70, tile_y*25, tile_x*90, tile_y*35);
 			m_monster4_gallery.SetRectPosition(tile_x*10, tile_y*40, tile_x*30, tile_y*50);
 			m_monster5_gallery.SetRectPosition(tile_x*40, tile_y*40, tile_x*60, tile_y*50);
+
+			if(m_monster1_collect == true)
+				m_monster1_gallery = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.unlock));
+			if(m_monster2_collect == true)
+				m_monster2_gallery = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.unlock));
+			if(m_monster3_collect == true)
+				m_monster3_gallery = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.unlock));
+			if(m_monster4_collect == true)
+				m_monster4_gallery = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.unlock));
+			if(m_monster5_collect == true)
+				m_monster5_gallery = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.unlock));
 		}
         //MakeEnemy();
         //CheckCollision();
@@ -496,7 +518,7 @@ public class GameState implements IState {
                 if(Collision.CollisionCheckPointToBox(_x,_y, m_galleryButton.GetX(), m_galleryButton.GetY(),
                         m_galleryButton.GetX() + tile_x * 35, m_galleryButton.GetY() + tile_y * 7)){
                     state = COLLECTION_SCENE;
-                    m_cancle.SetPosition(0, 0);
+                    m_home.SetPosition(0, 0);
                 }
                 // click quitButton
                 if(Collision.CollisionCheckPointToBox(_x,_y, m_quitButton.GetX(), m_quitButton.GetY(),
@@ -602,8 +624,8 @@ public class GameState implements IState {
 					}
 				}
 
-				if(Collision.CollisionCheckPointToBox(_x,_y, m_cancle.GetX(), m_cancle.GetY(),
-						m_cancle.GetX() + tile_x * 15, m_cancle.GetY() + tile_y * 8)){
+				if(Collision.CollisionCheckPointToBox(_x,_y, m_cancel.GetX(), m_cancel.GetY(),
+						m_cancel.GetX() + tile_x * 15, m_cancel.GetY() + tile_y * 8)){
 					if(formula_count > 0){
 						switch (formula_count){
 							case 1:
@@ -626,15 +648,15 @@ public class GameState implements IState {
 			}
 			else if(state == END_SCENE)
 			{
-                if(Collision.CollisionCheckPointToBox(_x,_y, m_cancle.GetX(), m_cancle.GetY(),
-                        m_cancle.GetX() + tile_x * 15, m_cancle.GetY() + tile_y * 8)){
+                if(Collision.CollisionCheckPointToBox(_x,_y, m_home.GetX(), m_home.GetY(),
+                        m_home.GetX() + tile_x * 15, m_home.GetY() + tile_y * 8)){
                     state = GAMESTART_SCENE;
                 }
 			}
 			else if(state == COLLECTION_SCENE)
 			{
-                if(Collision.CollisionCheckPointToBox(_x,_y, m_cancle.GetX(), m_cancle.GetY(),
-                        m_cancle.GetX() + tile_x * 15, m_cancle.GetY() + tile_y * 8)){
+                if(Collision.CollisionCheckPointToBox(_x,_y, m_home.GetX(), m_home.GetY(),
+                        m_home.GetX() + tile_x * 15, m_home.GetY() + tile_y * 8)){
                     state = GAMESTART_SCENE;
                 }
 			}
@@ -659,13 +681,13 @@ public class GameState implements IState {
 		m_monster_3.SetPosition(tile_x*20, tile_y);
 		m_monster_4.SetPosition(tile_x*20, tile_y);
 		m_monster_5.SetPosition(tile_x*20, tile_y);
-
+		m_monster_1.SetHp(25);
 		// button
 		m_plusButton.SetPosition(tile_x*5, tile_y*70);
 		m_minusButton.SetPosition(tile_x*30, tile_y*70);
 		m_mutipleButton.SetPosition(tile_x*55, tile_y*70);
 		m_divideButton.SetPosition(tile_x*80, tile_y*70);
-		m_cancle.SetPosition(tile_x*45, tile_y*85);
+		m_cancel.SetPosition(tile_x*45, tile_y*85);
 		// progressbar
         m_progressbar_empty.SetPosition(tile_x*10, tile_y*33);
         m_progressbar_hp.SetRectPosition(tile_x*10, tile_y*33, tile_x*96, tile_y*35);

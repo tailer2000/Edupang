@@ -15,4 +15,9 @@ public class Enemy_3 extends Enemy {
     public void Update(long GameTime) {
         super.Update(GameTime);
     }
+
+    @Override
+    public int GetHP() {
+        return super.GetHP();
+    }
 }

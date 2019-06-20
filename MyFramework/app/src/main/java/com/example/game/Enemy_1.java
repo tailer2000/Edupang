@@ -12,7 +12,7 @@ public class Enemy_1 extends Enemy {
         super(AppManager.getInstance().getBitmap(R.drawable.monster_1));
         this.InitSpriteData(900, 785, 1,4);
         state = Enemy.STATE_OUT;
-        hp = 100;
+        hp = 25;
     }
 
     @Override
@@ -20,4 +20,8 @@ public class Enemy_1 extends Enemy {
         super.Update(GameTime);
     }
 
+    @Override
+    public int GetHP() {
+        return super.GetHP();
+    }
 }
